@@ -11,16 +11,18 @@ analysis-paths: ["analysis"]
 data-paths: ["data"]
 macro-paths: ["macros"]
 
+profile: 'fivetran-redshift'
+
 models:
   snowplow:
     vars:
-      'snowplow:use_fivetran_interface': false
-      #'snowplow:events': TABLE OR {{ REF() }}
-      #'snowplow:context:web_page': TABLE OR {{ REF() }}
-      #'snowplow:context:performance_timing': TABLE OR {{ REF() }} or FALSE
-      #'snowplow:context:useragent': TABLE OR {{ REF() }} or FALSE
+      'snowplow:use_fivetran_interface': true
+      'snowplow:page_ping_frequency': 5
+      'snowplow:events': 'snowplow.event'
+      'snowplow:context:web_page': 'snowplow.web_page'
+      'snowplow:context:performance_timing': false
+      'snowplow:context:useragent': false
       'snowplow:timezone': 'America/New_York'
-      'snowplow:page_ping_frequency': 30
       'snowplow:app_ids': []
     base:
       materialized: ephemeral
