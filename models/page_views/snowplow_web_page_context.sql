@@ -1,7 +1,7 @@
 
 -- This one is a little tougher to make incremental
 -- because there's no timestamp field here. We could
--- relocate the event collector_tstamp (by root_id)
+-- relocate the event collector_tstamp (by event_id)
 -- onto snowplow_base_web_page_context, but that would
 -- likely mitigate any performance gains!
 
@@ -22,7 +22,7 @@ with web_page_context as (
 prep as (
 
     select
-        root_id,
+        event_id,
         id as page_view_id
 
     from web_page_context
@@ -33,7 +33,7 @@ prep as (
 duplicated as (
 
     select
-        root_id
+        event_id
 
     from prep
     group by 1
@@ -41,4 +41,4 @@ duplicated as (
 
 )
 
-select * from prep where root_id not in (select root_id from duplicated)
+select * from prep where event_id not in (select event_id from duplicated)

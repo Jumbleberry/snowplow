@@ -49,12 +49,12 @@ snowplow_web_events_scroll_depth:
 snowplow_web_page_context:
     constraints:
         not_null:
-            - root_id
+            - event_id
             - page_view_id
 
         unique:
-            - root_id
-            - '(page_view_id || root_id)'
+            - event_id
+            - '(page_view_id || event_id)'
 
 snowplow_page_views:
     constraints:
