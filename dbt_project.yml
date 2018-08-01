@@ -24,6 +24,14 @@ models:
       'snowplow:context:useragent': false
       'snowplow:timezone': 'America/New_York'
       'snowplow:app_ids': []
+      'snowplow:metadata': 'snowplow.metadata'
+      'snowplow:upsells': 'snowplow.upsell'
+      'snowplow:purchases': 'snowplow.purchase'
+      'snowplow:declines': 'snowplow.decline'
+      'snowplow:chargebacks': 'snowplow.chargeback'
+      'snowplow:add_to_cart': 'snowplow.add_to_cart'
+      'snowplow:remove_from_cart': 'snowplow.remove_from_cart'
+
     base:
       materialized: ephemeral
       optional:
@@ -31,3 +39,5 @@ models:
     page_views:
       optional:
         enabled: false
+    jumbleberry:
+      materialized: table
