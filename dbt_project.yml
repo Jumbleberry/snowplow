@@ -11,7 +11,7 @@ analysis-paths: ["analysis"]
 data-paths: ["data"]
 macro-paths: ["macros"]
 
-profile: 'fivetran-redshift'
+profile: 'default'
 
 models:
   snowplow:
