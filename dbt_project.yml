@@ -24,7 +24,7 @@ models:
       'snowplow:context:useragent': false
       'snowplow:timezone': 'America/New_York'
       'snowplow:app_ids': []
-      'snowplow:metadata': 'snowplow.metadata'
+      'snowplow:engagement': 'snowplow.engagement'
       'snowplow:upsells': 'snowplow.upsell'
       'snowplow:purchases': 'snowplow.purchase'
       'snowplow:declines': 'snowplow.decline'

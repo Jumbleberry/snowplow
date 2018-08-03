@@ -16,9 +16,9 @@ with sessions as (
 
 ),
 
-metadata as (
+engagement as (
 
-    select * from {{ ref('snowplow_metadata') }}
+    select * from {{ ref('snowplow_engagement') }}
 
 ),
 
@@ -143,13 +143,10 @@ users as (
         -- be extra cautious, ensure we only get one record per inferred_user_id
         row_number() over (partition by a.inferred_user_id order by a.session_start) as dedupe,
 
-        -- metadata
-        m.hit_id,
-        m.campaign_id,
-        m.trans_id,
-        m.c_1,
-        m.c_2,
-        m.c_3,
+        -- bridge page engagement
+        e.c_1,
+        e.c_2,
+        e.c_3,
 
         -- declines
         d.decline_count,
@@ -171,7 +168,7 @@ users as (
 
     from sessions as a
         inner join prep as b on a.inferred_user_id = b.inferred_user_id
-        left join metadata as m on a.inferred_user_id = m.inferred_user_id
+        left join engagement as e on a.inferred_user_id = e.inferred_user_id
         left join declines as d on a.inferred_user_id = d.inferred_user_id
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
