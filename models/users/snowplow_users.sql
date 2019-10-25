@@ -162,6 +162,7 @@ users as (
         p.purchase_total_value,
 
         -- upsells
+        -- upsells again
         u.upsell_count,
         u.upsell_max_value,
         u.upsell_total_value
