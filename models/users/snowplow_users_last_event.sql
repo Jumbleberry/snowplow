@@ -24,7 +24,7 @@ final as (
     d.page_title,
     d.br_family,
     d.os_family,
-    d.dvce_type
+    d.dvce_type,
     u.link_clicked_url,
     u.form_name,
     u.form_field_name,
