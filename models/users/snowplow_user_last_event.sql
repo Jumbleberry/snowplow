@@ -8,7 +8,7 @@
 }}
 
 with uevent as (
-    select * from {{ ref('snowplow_last_uevent')}}
+    select * from {{ ref('snowplow_users_last_ue')}}
 ),
 
 prep as (
@@ -22,6 +22,9 @@ final as (
     d.page_urlhost,
     d.page_urlpath,
     d.page_title,
+    d.br_family,
+    d.os_family,
+    d.dvce_type,
     u.link_clicked_url,
     u.form_name,
     u.form_field_name,
