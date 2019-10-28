@@ -38,7 +38,7 @@ final as (
     LEFT JOIN uevent as u
     on d.domain_userid = u.domain_userid
     
-    GROUP BY 1,2,3,4,5,6,7,8,9
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 )
 
 select * from final 
