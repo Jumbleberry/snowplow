@@ -1,5 +1,10 @@
-
-{{ config(materialized='table', sort='page_view_id', dist='page_view_id') }}
+{{
+    config(
+        materialized='table',
+        sort='page_view_id',
+        dist='page_view_id'
+    )
+}}
 
 
 with ua_parser_context as (
@@ -10,7 +15,7 @@ with ua_parser_context as (
 
 web_page_context as (
 
-    select * from {{ ref('snowplow_base_web_page_context') }}
+    select * from {{ ref('snowplow_web_page_context') }}
 
 ),
 
@@ -34,7 +39,7 @@ prep AS (
       ua.device_family
 
     from ua_parser_context as ua
-        inner join web_page_context as wp on ua.event_id = wp.event_id
+        inner join web_page_context as wp on ua.root_id = wp.root_id
 
     group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 
@@ -43,7 +48,7 @@ prep AS (
 duplicated as (
 
     select
-        page_view_id
+      page_view_id
 
     from prep
 
@@ -52,7 +57,19 @@ duplicated as (
 
 )
 
-select *
-
+select
+  page_view_id,
+  useragent_family,
+  useragent_major,
+  useragent_minor,
+  useragent_patch,
+  useragent_version,
+  os_family,
+  os_major,
+  os_minor,
+  os_patch,
+  os_patch_minor,
+  os_version,
+  device_family
 from prep
 where page_view_id not in (select page_view_id from duplicated)

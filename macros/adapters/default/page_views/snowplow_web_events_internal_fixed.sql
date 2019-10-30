@@ -1,4 +1,13 @@
 
+{% macro snowplow_web_events_internal_fixed() %}
+
+    {{ adapter_macro('snowplow.snowplow_web_events_internal_fixed') }}
+
+{% endmacro %}
+
+
+{% macro default__snowplow_web_events_internal_fixed() %}
+
 {{ config(materialized='ephemeral') }}
 
 -- "ignore nulls" doesn't work on postgres. TODO; do this another way
@@ -38,7 +47,8 @@ mapping as (
         {{ snowplow.get_utm_parameter('parent_urlquery', 'utm_medium') }} as utm_medium,
         {{ snowplow.get_utm_parameter('parent_urlquery', 'utm_campaign') }} as utm_campaign,
         {{ snowplow.get_utm_parameter('parent_urlquery', 'utm_content') }} as utm_content,
-        {{ snowplow.get_utm_parameter('parent_urlquery', 'utm_term') }} as utm_term
+        {{ snowplow.get_utm_parameter('parent_urlquery', 'utm_term') }} as utm_term,
+        true::boolean as is_internal
 
     from sessions
     where refr_medium = 'internal'
@@ -49,3 +59,5 @@ mapping as (
 )
 
 select * from mapping
+
+{% endmacro %}

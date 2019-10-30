@@ -4,6 +4,7 @@ view: snowplow_sessions {
   #Session identifying information
   dimension: session_id {
     type: string
+    primary_key: yes
     sql: ${TABLE}.session_id ;;
   }
 
@@ -485,11 +486,6 @@ view: snowplow_sessions {
     label: "Engaged?"
     type: yesno
     sql: ${TABLE}.user_engaged ;;
-  }
-
-  dimension: bounced_page_views {
-    type: number
-    sql: ${TABLE}.bounced_page_views ;;
   }
 
   dimension: new_vs_returning {
