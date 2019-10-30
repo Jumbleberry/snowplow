@@ -1,6 +1,6 @@
 {{
     config(
-        materialized = 'table',
+        materialized = 'ephemeral',
         sort='domain_userid',
         dist='domain_userid',
         unique_key='domain_userid'
