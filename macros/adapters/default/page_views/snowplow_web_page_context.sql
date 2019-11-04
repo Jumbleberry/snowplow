@@ -50,6 +50,6 @@ duplicated as (
 
 )
 
-select * from prep where root_id not in (select root_id from duplicated)
+select * from prep where event_id not in (select event_id from duplicated)
 
 {% endmacro %}
