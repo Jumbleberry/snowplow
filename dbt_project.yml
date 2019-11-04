@@ -22,12 +22,23 @@ models:
         enabled: false
 
     vars:
-      #'snowplow:events': TABLE OR {{ REF() }}
-      #'snowplow:context:web_page': TABLE OR {{ REF() }}
-      #'snowplow:context:performance_timing': TABLE OR {{ REF() }} or FALSE
-      #'snowplow:context:useragent': TABLE OR {{ REF() }} or FALSE
+      'snowplow:use_fivetran_interface': true
+      'snowplow:page_ping_frequency': 5
+      'snowplow:events': 'snowplow.event'
+      'snowplow:context:web_page': 'snowplow.web_page'
+      'snowplow:context:performance_timing': false
+      'snowplow:context:useragent': false
       'snowplow:timezone': 'America/New_York'
-      'snowplow:page_ping_frequency': 30
       'snowplow:app_ids': []
+      'snowplow:engagement': 'snowplow.engagement'
+      'snowplow:upsells': 'snowplow.upsell'
+      'snowplow:purchases': 'snowplow.purchase'
+      'snowplow:declines': 'snowplow.decline'
+      'snowplow:chargebacks': 'snowplow.chargeback'
+      'snowplow:add_to_cart': 'snowplow.add_to_cart'
+      'snowplow:remove_from_cart': 'snowplow.remove_from_cart'
+      'snowplow:link_click': 'snowplow.link_click'
+      'snowplow:submit_form': 'snowplow.submit_form'
+      'snowplow:change_form': 'snowplow.change_form'      
       'snowplow:pass_through_columns': []
       'snowplow:page_view_lookback_days': 1
