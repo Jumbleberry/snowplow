@@ -39,7 +39,7 @@ prep AS (
       ua.device_family
 
     from ua_parser_context as ua
-        inner join web_page_context as wp on ua.root_id = wp.root_id
+        inner join web_page_context as wp on ua.event_id = wp.event_id
 
     group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 
