@@ -31,7 +31,7 @@ with web_page_context as (
 prep as (
 
     select
-        root_id,
+        event_id,
         id as page_view_id
 
     from web_page_context
@@ -42,7 +42,7 @@ prep as (
 duplicated as (
 
     select
-        root_id
+        event_id
 
     from prep
     group by 1
