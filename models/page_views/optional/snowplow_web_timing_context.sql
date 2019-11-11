@@ -10,7 +10,7 @@ with performance_timing_context as (
 
 web_page_context as (
 
-    select * from {{ ref('snowplow_base_web_page_context') }}
+    select * from {{ ref('snowplow_web_page_context') }}
 
 ),
 
