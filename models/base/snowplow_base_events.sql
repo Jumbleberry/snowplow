@@ -10,9 +10,6 @@ with source as (
         {{ var('snowplow:events') }}
 
     {% endif %}
-
-    select * from {{ var('snowplow:events') }}
-
 ),
 
 filtered as (
