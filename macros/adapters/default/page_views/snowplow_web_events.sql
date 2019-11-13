@@ -47,7 +47,7 @@ web_page_context as (
 
 prep as (
 
-    select
+    selectR
 
         ev.event_id,
 
@@ -131,7 +131,7 @@ prep as (
         {% endfor %}
 
     from events as ev
-        inner join web_page_context as wp  on ev.event_id = wp.root_id
+        inner join web_page_context as wp  on ev.event_id = wp.event_id
 
     where ev.platform = 'web'
       and ev.event_name = 'page_view'
