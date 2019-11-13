@@ -47,7 +47,7 @@ web_page_context as (
 
 prep as (
 
-    selectR
+    select
 
         ev.event_id,
 
