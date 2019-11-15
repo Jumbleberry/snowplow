@@ -52,7 +52,7 @@ models:
     - name: snowplow_web_page_context
       tests:
           - unique:
-              column_name: "concat(page_view_id, root_id)"
+              column_name: "concat(page_view_id, event_id)"
     
       columns:
           - name: page_view_id
