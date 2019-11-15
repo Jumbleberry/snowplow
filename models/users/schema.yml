@@ -9,10 +9,7 @@ models:
           tests:
             - not_null
             - unique
-            - relationships:
-                to: ref('snowplow_users')
-                field: inferred_user_id
-            
+                    
         - name: page_view_id
           tests:
             - not_null
