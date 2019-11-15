@@ -59,7 +59,7 @@ models:
             tests:
                 - not_null
 
-          - name: root_id
+          - name: event_id
                 
     - name: snowplow_page_views
       description: '{{ doc("snowplow_page_views") }}'
