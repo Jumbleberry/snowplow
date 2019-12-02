@@ -11,13 +11,19 @@ analysis-paths: ["analysis"]
 data-paths: ["data"]
 macro-paths: ["macros"]
 
-profile: 'default'
-
 models:
   snowplow:
+    base:
+      materialized: ephemeral
+      optional:
+        enabled: false
+    page_views:
+      optional:
+        enabled: false
+
     vars:
       'snowplow:use_fivetran_interface': true
-      'snowplow:page_ping_frequency': 5
+      'snowplow:page_ping_frequency': 30
       'snowplow:events': 'snowplow.event'
       'snowplow:context:web_page': 'snowplow.web_page'
       'snowplow:context:performance_timing': false
@@ -33,14 +39,6 @@ models:
       'snowplow:remove_from_cart': 'snowplow.remove_from_cart'
       'snowplow:link_click': 'snowplow.link_click'
       'snowplow:submit_form': 'snowplow.submit_form'
-      'snowplow:change_form': 'snowplow.change_form'
-      
-    base:
-      materialized: ephemeral
-      optional:
-        enabled: false
-    page_views:
-      optional:
-        enabled: false
-    jumbleberry:
-      materialized: table
+      'snowplow:change_form': 'snowplow.change_form'      
+      'snowplow:pass_through_columns': []
+      'snowplow:page_view_lookback_days': 1
