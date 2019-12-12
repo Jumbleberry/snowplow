@@ -8,11 +8,8 @@
 
 with sumbit_form as (
 
-    select * from {{ var('snowplow:submit_form') }}
+    select * from {{ var('snowplow:change_form') }}
 
 )
 
-select 
-event_id,
-form_id
-from sumbit_form
+select * from change_form
