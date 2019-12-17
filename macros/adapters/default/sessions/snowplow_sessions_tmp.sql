@@ -86,6 +86,7 @@ sessions as (
         a.user_custom_id,
         a.user_snowplow_domain_id,
         a.user_snowplow_crossdomain_id,
+        REGEXP_SUBSTR(page_url_query, '[0-9][0-9][0-9][0-9][0-9][0-9]') as affiliate_id,
 
         -- sesssion
         a.session_id,

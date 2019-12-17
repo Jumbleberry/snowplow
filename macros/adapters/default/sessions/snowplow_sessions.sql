@@ -35,6 +35,7 @@ stitched as (
         coalesce(id.user_id, user_snowplow_domain_id) as inferred_user_id,
         user_snowplow_domain_id,
         user_snowplow_crossdomain_id,
+        affiliate_id,
 
         app_id,
         browser,

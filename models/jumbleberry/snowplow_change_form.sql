@@ -6,7 +6,7 @@
     )
 }}
 
-with sumbit_form as (
+with change_form as (
 
     select * from {{ var('snowplow:change_form') }}
 

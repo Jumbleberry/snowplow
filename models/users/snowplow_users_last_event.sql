@@ -1,9 +1,9 @@
 {{
     config(
         materialized = 'table',
-        sort='domain_userid',
-        dist='domain_userid',
-        unique_key='domain_userid'
+        sort='user_snowplow_domain_id',
+        dist='user_snowplow_domain_id',
+        unique_key='user_snowplow_domain_id'
     )
 }}
 
@@ -17,14 +17,19 @@ prep as (
 
 final as (
     SELECT 
-    d.domain_userid,
+    d.min_tstamp,
+    d.user_snowplow_domain_id,
+    d.affiliate_id,
     d.page_view_id,
-    d.page_urlhost,
-    d.page_urlpath,
+    d.page_url_host,
+    d.page_url_path,
     d.page_title,
-    d.br_family,
-    d.os_family,
-    d.dvce_type,
+    d.vertical_percentage_scrolled_tier,
+    d.time_engaged_in_s_tier,
+    d.time_engaged_in_s,
+    d.browser_name,
+    d.os_name,
+    d.device_type,
     u.link_clicked_url,
     u.form_name,
     u.form_field_name,
@@ -36,9 +41,9 @@ final as (
     FROM prep as d
     
     LEFT JOIN uevent as u
-    on d.domain_userid = u.domain_userid
+    on d.user_snowplow_domain_id = u.domain_userid
     
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 )
 
 select * from final 

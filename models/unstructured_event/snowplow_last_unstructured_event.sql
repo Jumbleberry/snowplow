@@ -1,6 +1,6 @@
 {{
     config(
-        materialized = 'ephemeral',
+        materialized = 'view',
         sort='domain_userid',
         dist='domain_userid',
         unique_key='domain_userid'
@@ -27,11 +27,11 @@ joined as (
     cf.element_id as form_field_name
     from prep p
     
-    left join {{ var('snowplow:link_click') }} as lc
+    left join {{ ref('snowplow_link_click') }} as lc
     on p.event_id = lc.event_id
-    left join {{ var('snowplow:submit_form') }} as sf
+    left join {{ ref('snowplow_submit_form') }} as sf
     on p.event_id = sf.event_id
-    left join {{ var('snowplow:change_form') }} as cf
+    left join {{ ref('snowplow_change_form') }} as cf
     on p.event_id = cf.event_id
     
     WHERE p.de_dupe = '1'

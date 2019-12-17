@@ -94,6 +94,7 @@ prep as (
         a.user_id as user_custom_id,
         a.domain_userid as user_snowplow_domain_id,
         a.network_userid as user_snowplow_crossdomain_id,
+        REGEXP_SUBSTR(a.page_urlquery, '[0-9][0-9][0-9][0-9][0-9][0-9]') as affiliate_id,
 
         b.min_tstamp,
         b.max_tstamp,

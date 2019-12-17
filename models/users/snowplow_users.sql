@@ -72,6 +72,8 @@ users as (
         a.user_custom_id,
         a.user_snowplow_domain_id,
         a.user_snowplow_crossdomain_id,
+        REGEXP_SUBSTR(a.first_page_url_query, '[0-9][0-9][0-9][0-9][0-9][0-9]') as affiliate_id,
+
 
         -- first sesssion: time
         b.first_session_start,
