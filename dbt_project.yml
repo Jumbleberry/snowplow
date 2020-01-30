@@ -23,7 +23,7 @@ models:
 
     vars:
       'snowplow:use_fivetran_interface': true
-      'snowplow:page_ping_frequency': 30
+      'snowplow:page_ping_frequency': 3
       'snowplow:events': 'snowplow.event'
       'snowplow:context:web_page': 'snowplow.web_page'
       'snowplow:context:performance_timing': false
