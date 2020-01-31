@@ -363,7 +363,7 @@ final as (
             when max_session_page_view_index = page_view_in_session_index
                 then 1
             else 0
-        end as last_page_view_in_session,
+        end as last_page_view_in_session
     from prep
 )
 
