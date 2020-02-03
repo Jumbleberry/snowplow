@@ -138,6 +138,6 @@ prep as (
 
 )
 
-select * from dedupe 
+select * from prep 
 
 {% endmacro %}
