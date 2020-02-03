@@ -28,7 +28,7 @@
 -- but model become much faster comparing to selecting all events
 with all_events as (
 
-    select * from {{ ref('snowplow_web_events') }}
+    select * from {{ ref('snowplow_web_events_details') }}
     {% if is_incremental() %}
     where collector_tstamp > (
         DATEADD('day', -1 * {{var('snowplow:page_view_lookback_days')}}, (select coalesce(max(max_tstamp), '0001-01-01') from {{ this }}))
@@ -116,31 +116,18 @@ prep as (
         -- page view: time
         CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.min_tstamp) as page_view_start,
         CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.max_tstamp) as page_view_end,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_time,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI') as page_view_minute,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24') as page_view_hour,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD') as page_view_date,
-        to_char(date_trunc('week', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM-DD') as page_view_week,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM') as page_view_month,
-        to_char(date_trunc('quarter', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM') as page_view_quarter,
-        date_part('y', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp))::INTEGER as page_view_year,
-
+   
         -- page view: time in the user's local timezone
         convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.min_tstamp) as page_view_start_local,
         convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.max_tstamp) as page_view_end_local,
     
-        -- derived dimensions
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_local_time,
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'HH24:MI') as page_view_local_time_of_day,
-        date_part('hour', convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer as page_view_local_hour_of_day,
-        trim(to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'd')) as page_view_local_day_of_week,
-        mod(extract(dow from convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer - 1 + 7, 7) as page_view_local_day_of_week_index,
-
+      
         -- engagement
         b.time_engaged_in_s,
+
         case
-            when time_engaged_in_s >= 180 then '180s_stay'
-            when time_engaged_in_s >= 60 then '60s_stay'
+            when b.time_engaged_in_s >= 180 then '180s_stay'
+            when b.time_engaged_in_s >= 60 then '60s_stay'
             when b.time_engaged_in_s >= 15 then '15s_stay'
             when b.time_engaged_in_s >= 7 then '7s_stay'
             when b.time_engaged_in_s >= 3 then '3s_stay'
@@ -161,8 +148,6 @@ prep as (
             when c.relative_vmax between 80 and 100 then 'viewport_5'
             else null
         end as vertical_percentage_scrolled_tier,
-        case when b.time_engaged_in_s = 0 then true else false end as user_bounced,
-        case when b.time_engaged_in_s >= 30 and c.relative_vmax >= 25 then true else false end as user_engaged,
 
         -- page
         a.page_urlhost || a.page_urlpath as page_url,
