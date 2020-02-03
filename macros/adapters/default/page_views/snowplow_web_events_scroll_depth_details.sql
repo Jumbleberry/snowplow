@@ -7,6 +7,7 @@
 
 
 {% macro default__snowplow_web_events_scroll_depth_details() %}
+  -- depends_on: {{ ref('snowplow_base_events') }}
 
 {{
     config(

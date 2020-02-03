@@ -47,7 +47,7 @@ prep as (
     select
 
         wp.page_view_id,
-        ev.event_id,
+        wp.event_id,
         min({{snowplow.timestamp_ntz('ev.derived_tstamp')}}) as min_tstamp,
         max({{snowplow.timestamp_ntz('ev.derived_tstamp')}}) as max_tstamp,
 
@@ -70,7 +70,7 @@ relevant_existing as (
 
     select
         page_view_id,
-        ev.event_id,
+        event_id,
         min_tstamp,
         max_tstamp,
         pv_count,
@@ -86,7 +86,7 @@ unioned_cte as (
 
     select
         page_view_id,
-        ev.event_id,
+        event_id,
         min_tstamp,
         max_tstamp,
         pv_count,
@@ -98,7 +98,7 @@ unioned_cte as (
 
     select
         page_view_id,
-        ev.event_id,
+        event_id,
         min_tstamp, 
         max_tstamp,
         pv_count,
@@ -112,7 +112,7 @@ merged as (
 
     select
         page_view_id,
-        ev.event_id,
+        event_id,
         min(min_tstamp) as min_tstamp,
         max(max_tstamp) as max_tstamp,
         sum(pv_count) as pv_count,
@@ -120,7 +120,7 @@ merged as (
         sum(time_engaged_in_s) as time_engaged_in_s
 
     from unioned_cte
-    group by 1
+    group by 1,2
 
 
 )
