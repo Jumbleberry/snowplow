@@ -7,6 +7,7 @@
 
 
 {% macro default__snowplow_page_views_details() %}
+  -- depends_on: {{ ref('snowplow_base_events') }}
 
 {{
     config(
