@@ -53,7 +53,7 @@ prep as (
 
         sum(case when ev.event_name = 'page_view' then 1 else 0 end) as pv_count,
         sum(case when ev.event_name = 'page_ping' then 1 else 0 end) as pp_count,
-        (sum(case when ev.event_name = 'page_ping' then 1 else 0 end) * {{ var('snowplow:page_ping_frequency', 3) }}) as time_engaged_in_s
+        (sum(case when ev.event_name = 'page_ping' then 1 else 0 end) * {{ var('snowplow:page_ping_frequency', 5) }}) as time_engaged_in_s
 
     from events as ev
         inner join web_page_context as wp on ev.event_id = wp.event_id

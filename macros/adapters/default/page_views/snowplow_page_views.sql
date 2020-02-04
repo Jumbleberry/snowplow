@@ -110,37 +110,15 @@ prep as (
         row_number() over (partition by a.domain_sessionid order by a.dvce_created_tstamp) as page_view_in_session_index,
         count(*) over (partition by domain_sessionid) as max_session_page_view_index,
 
-        -- page view: time
-        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.min_tstamp) as page_view_start,
-        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.max_tstamp) as page_view_end,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_time,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI') as page_view_minute,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24') as page_view_hour,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD') as page_view_date,
-        to_char(date_trunc('week', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM-DD') as page_view_week,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM') as page_view_month,
-        to_char(date_trunc('quarter', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM') as page_view_quarter,
-        date_part('y', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp))::INTEGER as page_view_year,
-
-        -- page view: time in the user's local timezone
-        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.min_tstamp) as page_view_start_local,
-        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.max_tstamp) as page_view_end_local,
-    
-        -- derived dimensions
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_local_time,
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'HH24:MI') as page_view_local_time_of_day,
-        date_part('hour', convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer as page_view_local_hour_of_day,
-        trim(to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'd')) as page_view_local_day_of_week,
-        mod(extract(dow from convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer - 1 + 7, 7) as page_view_local_day_of_week_index,
 
         -- engagement
         b.time_engaged_in_s,
         case
-            when time_engaged_in_s >= 180 then '180s_stay'
-            when time_engaged_in_s >= 60 then '60s_stay'
-            when b.time_engaged_in_s >= 15 then '15s_stay'
-            when b.time_engaged_in_s >= 7 then '7s_stay'
-            when b.time_engaged_in_s >= 3 then '3s_stay'
+            when b.time_engaged_in_s >= 180 then '180s_stay'
+            when b.time_engaged_in_s >= 60 then '60s_stay'
+            when b.time_engaged_in_s >= 30 then '30s_stay'
+            when b.time_engaged_in_s >= 11 then '11s_stay'
+            when b.time_engaged_in_s >= 5 then '5s_stay'
             else null
         end as time_engaged_in_s_tier,
 
@@ -363,7 +341,8 @@ final as (
             when max_session_page_view_index = page_view_in_session_index
                 then 1
             else 0
-        end as last_page_view_in_session
+        end as last_page_view_in_session,
+        case when lead(page_view_index,1) over (partition by user_snowplow_domain_id order by min_tstamp) - page_view_index = 1 then 1 else 0 end as continued
     from prep
 )
 
