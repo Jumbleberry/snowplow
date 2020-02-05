@@ -5,7 +5,7 @@ models:
       description: table containing last users event
       
       columns:
-        - name: domain_userid
+        - name: user_snowplow_domain_id
           tests:
             - not_null
             - unique

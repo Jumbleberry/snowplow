@@ -52,8 +52,8 @@ prep as (
         inferred_user_id,
 
         min(session_start) as first_session_start,
-        min(session_start_local) as first_session_start_local,
         max(session_end) as last_session_end,
+        max(session_index) as last_session_index,
         sum(page_views) as page_views,
         count(*) as sessions,
         sum(time_engaged_in_s) as time_engaged_in_s
@@ -72,7 +72,7 @@ users as (
         a.user_custom_id,
         a.user_snowplow_domain_id,
         a.user_snowplow_crossdomain_id,
-        REGEXP_SUBSTR(a.first_page_url_query, '[0-9][0-9][0-9][0-9][0-9][0-9]') as affiliate_id,
+        a.affiliate_id,
 
 
         -- first sesssion: time
@@ -80,6 +80,7 @@ users as (
 
         -- last session: time
         b.last_session_end,
+        b.last_session_index,
 
         -- engagement
         b.page_views,
@@ -94,7 +95,6 @@ users as (
         a.first_page_url_path,
         a.first_page_url_query,
         a.first_page_url_fragment,
-
         a.first_page_title,
 
         -- referer
