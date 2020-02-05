@@ -1,6 +1,41 @@
 version: 2
 
 models:
+    - name: snowplow_web_events_details
+      description: Schema and table for web page context by event_id
+
+      columns:
+          - name: domain_userid
+            tests:
+                - not_null
+                
+          - name: collector_tstamp
+            tests:
+                - not_null
+                
+          - name: domain_sessionid
+            tests:
+                - not_null
+                        
+          - name: domain_sessionid
+            tests:
+                - not_null
+                
+          - name: page_view_id
+            tests:
+                - not_null
+                - relationships:
+                    to: ref('snowplow_web_page_context')
+                    field: page_view_id
+
+          - name: event_id
+            tests:
+                - not_null
+                - unique
+                - relationships:
+                    to: ref('snowplow_web_page_context')
+                    field: event_id
+
     - name: snowplow_web_events
       description: Schema and table for web page context
 
@@ -49,6 +84,26 @@ models:
                     to: ref('snowplow_web_page_context')
                     field: page_view_id
 
+    - name: snowplow_web_events_time_details
+    
+      columns:
+          - name: event_id
+            tests:
+                - unique
+                - relationships:
+                    to: ref('snowplow_web_page_context')
+                    field: event_id
+                    
+    - name: snowplow_web_events_scroll_depth_details
+    
+      columns:
+          - name: event_id
+            tests:
+                - unique
+                - relationships:
+                    to: ref('snowplow_web_page_context')
+                    field: event_id
+
     - name: snowplow_web_page_context
       tests:
           - unique:
@@ -60,7 +115,43 @@ models:
                 - not_null
 
           - name: event_id
+
+    - name: snowplow_page_views_details
+      description: snowplow_page_views by event_id
+
+      columns:
+          - name: user_custom_id
+            description: Unique ID set by business, user_id atomic field
+            
+          - name: user_snowplow_domain_id
+            description: User ID set by Snowplow using 1st party cookie
+            tests:
+                - not_null
                 
+          - name: user_snowplow_crossdomain_id
+            description: User ID set by Snowplow using 3rd party cookie
+            
+          - name: session_id
+            description: A visit / session identifier
+            tests:
+                - not_null
+          
+          - name: session_index
+            description: A visit / session index
+            tests:
+                - not_null
+                
+          - name: page_view_id
+            description: Universally unique identifier
+            tests:
+                - not_null
+
+          - name: event_id
+            description: Universally unique identifier
+            tests:
+                - not_null 
+                - unique  
+
     - name: snowplow_page_views
       description: '{{ doc("snowplow_page_views") }}'
 
