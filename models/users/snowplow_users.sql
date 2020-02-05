@@ -78,26 +78,6 @@ users as (
         -- first sesssion: time
         b.first_session_start,
 
-        -- derived dimensions
-        to_char(b.first_session_start, 'YYYY-MM-DD HH24:MI:SS') as first_session_time,
-        to_char(b.first_session_start, 'YYYY-MM-DD HH24:MI') as first_session_minute,
-        to_char(b.first_session_start, 'YYYY-MM-DD HH24') as first_session_hour,
-        to_char(b.first_session_start, 'YYYY-MM-DD') as first_session_date,
-        to_char(date_trunc('week', b.first_session_start), 'YYYY-MM-DD') as first_session_week,
-        to_char(b.first_session_start, 'YYYY-MM') as first_session_month,
-        to_char(date_trunc('quarter', b.first_session_start), 'YYYY-MM') as first_session_quarter,
-        date_part('y', b.first_session_start)::integer as first_session_year,
-
-        -- first session: time in the user's local timezone
-        b.first_session_start_local,
-
-        -- derived dimensions
-        to_char(b.first_session_start_local, 'YYYY-MM-DD HH24:MI:SS') as first_session_local_time,
-        to_char(b.first_session_start_local, 'HH24:MI') as first_session_local_time_of_day,
-        date_part('hour', b.first_session_start_local)::integer as first_session_local_hour_of_day,
-        trim(to_char(b.first_session_start_local, 'd')) as first_session_local_day_of_week,
-        mod(extract(dow from b.first_session_start_local)::integer - 1 + 7, 7) as first_session_local_day_of_week_index,
-
         -- last session: time
         b.last_session_end,
 

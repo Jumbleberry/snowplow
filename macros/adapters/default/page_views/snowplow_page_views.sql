@@ -99,6 +99,9 @@ prep as (
         b.min_tstamp,
         b.max_tstamp,
 
+        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.min_tstamp) as page_view_start,
+        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.max_tstamp) as page_view_end,
+
         -- sesssion
         a.domain_sessionid as session_id,
         a.domain_sessionidx as session_index,
