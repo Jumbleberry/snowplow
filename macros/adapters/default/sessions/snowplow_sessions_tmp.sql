@@ -54,6 +54,8 @@ prep AS (
         -- time
         min(page_view_start) as session_start,
         max(page_view_end) as session_end,
+        min(page_view_start_local) as session_start_local,
+        max(page_view_end_local) as session_end_local,
 
         -- engagement
         count(*) as page_views,

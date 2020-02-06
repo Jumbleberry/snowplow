@@ -52,7 +52,9 @@ prep as (
         inferred_user_id,
 
         min(session_start) as first_session_start,
+        min(session_start_local) as first_session_start_local,
         max(session_end) as last_session_end,
+        max(session_end_local) as last_session_end_local, 
         max(session_index) as last_session_index,
         sum(page_views) as page_views,
         count(*) as sessions,
@@ -80,6 +82,7 @@ users as (
 
         -- last session: time
         b.last_session_end,
+        b.last_session_end_local,
         b.last_session_index,
 
         -- engagement

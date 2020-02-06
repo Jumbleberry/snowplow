@@ -102,6 +102,8 @@ prep as (
 
         CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.min_tstamp) as page_view_start,
         CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.max_tstamp) as page_view_end,
+        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.min_tstamp) as page_view_start_local,
+        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.max_tstamp) as page_view_end_local,
 
         -- sesssion
         a.domain_sessionid as session_id,
