@@ -79,6 +79,7 @@ users as (
 
         -- first sesssion: time
         b.first_session_start,
+        b.first_session_start_local,
 
         -- last session: time
         b.last_session_end,
