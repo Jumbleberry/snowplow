@@ -94,6 +94,8 @@ sessions as (
         -- session: time
         b.session_start,
         b.session_end,
+        b.session_start_local,
+        b.session_end_local,
         
         -- engagement
         b.page_views,
