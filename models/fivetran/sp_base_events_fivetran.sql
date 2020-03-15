@@ -1,7 +1,7 @@
 {% set br_viewwidth = "
     case
         when br_viewheight like '%x%'
-        then split_part(br_viewheight, 'x', 1)::integer
+        then split_part(br_viewheight, 'x', 1)::float
         else null
     end
 "%}
@@ -9,7 +9,7 @@
 {% set br_viewheight = "
     case
         when br_viewheight like '%x%'
-        then split_part(br_viewheight, 'x', 2)::integer
+        then split_part(br_viewheight, 'x', 2)::float
         else null
     end
 "%}
