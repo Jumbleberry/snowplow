@@ -58,7 +58,7 @@ prep as (
         ev.collector_tstamp,
 
         ev.domain_sessionid,
-        ev.domain_sessionidx,
+        ev.domain_sessionidx::integer,
 
         wp.page_view_id,
 
