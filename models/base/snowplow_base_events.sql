@@ -1,15 +1,7 @@
 with source as (
-    select * from
 
-    {% if var('snowplow:use_fivetran_interface') %}
+    select * from {{ var('snowplow:events') }}
 
-        {{ref('sp_base_events_fivetran')}}
-
-    {% else %}
-
-        {{ var('snowplow:events') }}
-
-    {% endif %}
 ),
 
 filtered as (

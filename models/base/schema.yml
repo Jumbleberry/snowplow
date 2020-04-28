@@ -5,7 +5,11 @@ models:
     description: '{{ doc("snowplow_base_events") }}'
 
     columns:      
-        
+        - name: app_id
+          description: Application ID
+          tests: 
+              - not_null
+          
         - name: platform
           description: Platform
               
@@ -25,7 +29,6 @@ models:
           description: A UUID for each event
           tests:
               - not_null
-              - unique
               
         - name: txn_id
           description: Transaction ID set client-side, used to de-dupe records
