@@ -29,7 +29,7 @@ models:
       #'snowplow:context:performance_timing': TABLE OR {{ REF() }} or FALSE
       #'snowplow:context:useragent': TABLE OR {{ REF() }} or FALSE
       'snowplow:timezone': 'America/New_York'
-      'snowplow:page_ping_frequency': 30
+      'snowplow:page_ping_frequency': 5
       'snowplow:app_ids': []
       'snowplow:pass_through_columns': []
       'snowplow:page_view_lookback_days': 1
