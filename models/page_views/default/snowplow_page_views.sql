@@ -142,6 +142,7 @@ prep as (
             else null
         end as vertical_percentage_scrolled_tier,
 
+        case when b.time_engaged_in_s = 0 then true else false end as user_bounced,
         case when b.time_engaged_in_s >= 30 and c.relative_vmax >= 25 then true else false end as user_engaged,
 
         -- page
