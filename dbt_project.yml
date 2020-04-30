@@ -32,6 +32,11 @@ models:
       'snowplow:timezone': 'America/New_York'
       'snowplow:app_ids': []
       'snowplow:engagement': 'snowplow.engagement'
+      'snowplow:lead': 'snowplow.lead'
+      'snowplow:viewcontent': 'snowplow.viewcontent'
+      'snowplow:complete_registration': 'snowplow.complete_registration'
+      'snowplow:initiate_checkout': 'snowplow.initiate_checkout'
+      'snowplow:add_payment_info': 'snowplow.add_payment_info'
       'snowplow:upsells': 'snowplow.upsell'
       'snowplow:purchases': 'snowplow.purchase'
       'snowplow:declines': 'snowplow.decline'
