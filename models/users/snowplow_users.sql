@@ -21,15 +21,52 @@ engagement as (
 
 ),
 
+lead as (
+
+    select * from {{ ref('snowplow_leads') }}
+
+),
+
+
+viewcontent as (
+
+    select * from {{ ref('snowplow_viewcontent') }}
+
+),
+
+
+initiate_checkout as (
+
+    select * from {{ ref('snowplow_initiate_checkout') }}
+
+),
+
+add_payment_info as (
+
+    select * from {{ ref('snowplow_add_payment_info') }}
+
+),
+
+add_to_cart as (
+
+    select * from {{ ref('snowplow_add_to_cart') }}
+
+),
+
 declines as (
 
     select * from {{ ref('snowplow_declines') }}
-
 ),
 
 chargebacks as (
 
     select * from {{ ref('snowplow_chargebacks') }}
+
+),
+
+complete_registration as (
+
+    select * from {{ ref('snowplow_complete_registration') }}
 
 ),
 
@@ -125,32 +162,27 @@ users as (
         -- be extra cautious, ensure we only get one record per inferred_user_id
         row_number() over (partition by a.inferred_user_id order by a.session_start) as dedupe,
 
-        -- bridge page engagement
-        e.c_1,
-        e.c_2,
-        e.c_3,
-
         -- declines
         d.decline_count,
-        d.decline_total_value,
-
+    
         -- chargebacks
         cb.chargeback_count,
-        cb.chargeback_total_value,
-
+    
         -- purchases
         p.purchase_count,
-        p.purchase_max_value,
-        p.purchase_total_value,
-
+    
         -- upsells
-        u.upsell_count,
-        u.upsell_max_value,
-        u.upsell_total_value
-
+        u.upsell_count
+    
     from sessions as a
         inner join prep as b on a.inferred_user_id = b.inferred_user_id
         left join engagement as e on a.inferred_user_id = e.inferred_user_id
+        left join lead as l on a.inferred_user_id = l.inferred_user_id
+        left join viewcontent as v on a.inferred_user_id = v.inferred_user_id
+        left join initiate_checkout as ic on a.inferred_user_id = ic.inferred_user_id
+        left join add_payment_info as ic on a.inferred_user_id = ap.inferred_user_id
+        left join add_to_cart as ic on a.inferred_user_id = ac.inferred_user_id
+        left join complete_registration as ic on a.inferred_user_id = cr.inferred_user_id
         left join declines as d on a.inferred_user_id = d.inferred_user_id
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
