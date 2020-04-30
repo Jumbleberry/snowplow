@@ -46,7 +46,7 @@ prep as (
         (sum(case when ev.event_name = 'page_ping' then 1 else 0 end) * {{ var('snowplow:page_ping_frequency', 30) }}) as time_engaged_in_s
 
     from events as ev
-        inner join web_page_context as wp on ev.event_id = wp.root_id
+        inner join web_page_context as wp on ev.event_id = wp.event_id
 
     where ev.event_name in ('page_view', 'page_ping')
     group by 1
