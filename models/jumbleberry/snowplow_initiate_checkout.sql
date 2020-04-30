@@ -22,7 +22,7 @@ initiate_checkout_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(ic.*) as initiate_checkout_count,
+        count(ic.*) as initiate_checkout_count
 
     from event_to_user_map as m
         inner join initiate_checkout as ic
