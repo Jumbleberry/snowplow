@@ -161,6 +161,16 @@ users as (
 
         -- be extra cautious, ensure we only get one record per inferred_user_id
         row_number() over (partition by a.inferred_user_id order by a.session_start) as dedupe,
+    
+        -- events
+        e.engagement_count,
+        l.lead_count,
+        v.viewcontent_count,
+        ic.initiate_count,
+        ap.add_payment_info_count,
+        ac.add_to_cart_count,
+        cr.complete_registration_count,
+        
 
         -- declines
         d.decline_count,
@@ -180,9 +190,9 @@ users as (
         left join lead as l on a.inferred_user_id = l.inferred_user_id
         left join viewcontent as v on a.inferred_user_id = v.inferred_user_id
         left join initiate_checkout as ic on a.inferred_user_id = ic.inferred_user_id
-        left join add_payment_info as ic on a.inferred_user_id = ap.inferred_user_id
-        left join add_to_cart as ic on a.inferred_user_id = ac.inferred_user_id
-        left join complete_registration as ic on a.inferred_user_id = cr.inferred_user_id
+        left join add_payment_info as ap on a.inferred_user_id = ap.inferred_user_id
+        left join add_to_cart as ac on a.inferred_user_id = ac.inferred_user_id
+        left join complete_registration as cr on a.inferred_user_id = cr.inferred_user_id
         left join declines as d on a.inferred_user_id = d.inferred_user_id
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
