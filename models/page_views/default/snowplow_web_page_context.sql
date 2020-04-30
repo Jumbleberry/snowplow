@@ -32,7 +32,7 @@ prep as (
 duplicated as (
 
     select
-        root_id
+        event_id
 
     from prep
     group by 1
