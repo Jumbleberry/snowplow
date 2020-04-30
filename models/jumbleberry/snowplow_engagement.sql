@@ -22,7 +22,7 @@ engagement_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(e.*) as decline_count
+        count(e.*) as engagement_count
 
     from event_to_user_map as m
         inner join engagement as e
