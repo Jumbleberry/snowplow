@@ -24,7 +24,7 @@ models:
 
     vars:
       'snowplow:use_fivetran_interface': true
-      'snowplow:page_ping_frequency': 30
+      'snowplow:page_ping_frequency': 5
       'snowplow:events': 'snowplow.event'
       'snowplow:context:web_page': 'snowplow.web_page'
       'snowplow:context:performance_timing': false
@@ -33,7 +33,7 @@ models:
       'snowplow:app_ids': []
       'snowplow:engagement': 'snowplow.engagement'
       'snowplow:lead': 'snowplow.lead'
-      'snowplow:viewcontent': 'snowplow.viewcontent'
+      'snowplow:viewcontent': 'snowplow.view_content'
       'snowplow:complete_registration': 'snowplow.complete_registration'
       'snowplow:initiate_checkout': 'snowplow.initiate_checkout'
       'snowplow:add_payment_info': 'snowplow.add_payment_info'
