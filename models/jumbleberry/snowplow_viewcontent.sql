@@ -22,10 +22,11 @@ viewcontent_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(d.*) as viewcontent_count
+        count(v.*) as viewcontent_count
         
     from event_to_user_map as m
-        inner join viewcontent as v on m.event_id = v.event_id
+        inner join viewcontent as v
+        on m.event_id = v.event_id
 
     group by
         m.inferred_user_id
