@@ -166,7 +166,7 @@ users as (
         e.engagement_count,
         l.lead_count,
         v.viewcontent_count,
-        ic.initiate_count,
+        ic.initiate_checkout_count,
         ap.add_payment_info_count,
         ac.add_to_cart_count,
         cr.complete_registration_count,
