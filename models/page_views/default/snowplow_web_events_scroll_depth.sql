@@ -51,7 +51,7 @@ prep as (
         least(greatest(max(coalesce(ev.pp_yoffset_max, 0)), 0), max(ev.doc_height)) as vmax
 
     from events as ev
-        inner join web_page_context as wp on ev.event_id = wp.root_id
+        inner join web_page_context as wp on ev.event_id = wp.event_id
 
     where ev.event_name in ('page_view', 'page_ping')
       and ev.doc_height > 0
