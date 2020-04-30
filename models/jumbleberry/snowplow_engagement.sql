@@ -22,12 +22,11 @@ engagement_with_user_id as (
 
     select 
         m.inferred_user_id,
-        max(e.c_1) as c_1,
-        max(e.c_2) as c_2,
-        max(e.c_3) as c_3
+        count(e.*) as decline_count
 
     from event_to_user_map as m
-        inner join engagement as e on m.event_id = e.event_id
+        inner join engagement as e
+        on m.event_id = e.event_id
 
     group by
         m.inferred_user_id
