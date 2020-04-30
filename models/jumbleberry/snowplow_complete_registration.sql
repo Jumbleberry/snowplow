@@ -22,7 +22,7 @@ complete_registration_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(cr.*) as complete_registrations
+        count(cr.*) as complete_registration_count
         
     from event_to_user_map as m
         inner join complete_registration as cr 
