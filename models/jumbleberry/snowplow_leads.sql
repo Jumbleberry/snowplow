@@ -22,10 +22,11 @@ leads_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(d.*) as lead_count
+        count(l.*) as lead_count
         
     from event_to_user_map as m
-        inner join leads as l on m.event_id = l.event_id
+        inner join leads as l 
+        on m.event_id = l.event_id
 
     group by
         m.inferred_user_id
