@@ -1,13 +1,3 @@
-
-{% macro snowplow_id_map() %}
-
-    {{ adapter_macro('snowplow.snowplow_id_map') }}
-
-{% endmacro %}
-
-
-{% macro default__snowplow_id_map() %}
-
 -- get new events
 -- determine most recent mapping between domain_userid and user_id
 -- add new & overwrite existing if changed
@@ -17,7 +7,8 @@
         materialized='incremental',
         sort='domain_userid',
         dist='domain_userid',
-        unique_key='domain_userid'
+        unique_key='domain_userid',
+        enabled=is_adapter('default')
     )
 }}
 
@@ -29,13 +20,10 @@ with all_events as (
 
 new_events as (
 
-    select *
-    from all_events
+    select * from all_events
 
     {% if is_incremental() %}
-    where collector_tstamp > (
-        select coalesce(max(max_tstamp), '0001-01-01') from {{ this }}
-    )
+        where collector_tstamp > {{get_start_ts(this, 'max_tstamp')}}
     {% endif %}
 
 ),
@@ -80,5 +68,3 @@ dedupe as (
 )
 
 select * from dedupe where idx = 1
-
-{% endmacro %}

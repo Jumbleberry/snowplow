@@ -10,6 +10,7 @@ test-paths: ["test"]
 analysis-paths: ["analysis"]
 data-paths: ["data"]
 macro-paths: ["macros"]
+require-dbt-version: ">=0.16.0"
 
 models:
   snowplow:

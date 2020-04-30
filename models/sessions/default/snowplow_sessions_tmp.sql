@@ -1,19 +1,10 @@
-
-{% macro snowplow_sessions_tmp() %}
-
-    {{ adapter_macro('snowplow.snowplow_sessions_tmp') }}
-
-{% endmacro %}
-
-
-{% macro default__snowplow_sessions_tmp() %}
-
 {{
     config(
         materialized='incremental',
         sort='session_start',
         dist='user_snowplow_domain_id',
-        unique_key='session_id'
+        unique_key='session_id',
+        enabled=is_adapter('default')
     )
 }}
 
@@ -29,7 +20,7 @@ relevant_sessions as (
     from all_web_page_views
 
     {% if is_incremental() %}
-        where page_view_start > (select max(session_start) from {{ this }})
+        where page_view_start > {{get_start_ts(this, 'session_start')}}
     {% endif %}
 
 ),
@@ -60,7 +51,7 @@ prep AS (
 
         -- engagement
         count(*) as page_views,
-        sum(case when user_bounced then 1 else 0 end) as bounced_page_views,
+
         sum(case when user_engaged then 1 else 0 end) as engaged_page_views,
 
         sum(time_engaged_in_s) as time_engaged_in_s,
@@ -94,32 +85,14 @@ sessions as (
         -- session: time
         b.session_start,
         b.session_end,
-        
-        -- derived dimensions
-        to_char(b.session_start, 'YYYY-MM-DD HH24:MI:SS') as session_time,
-        to_char(b.session_start, 'YYYY-MM-DD HH24:MI') as session_minute,
-        to_char(b.session_start, 'YYYY-MM-DD HH24') as session_hour,
-        to_char(b.session_start, 'YYYY-MM-DD') as session_date,
-        to_char(date_trunc('week', b.session_start), 'YYYY-MM-DD') as session_week,
-        to_char(b.session_start, 'YYYY-MM') as session_month,
-        to_char(date_trunc('quarter', b.session_start), 'YYYY-MM') as session_quarter,
-        date_part('y', b.session_start)::integer as session_year,
-
 
         -- session: time in the user's local timezone
         b.session_start_local,
         b.session_end_local,
 
-        -- derived dimensions
-        to_char(b.session_start_local, 'YYYY-MM-DD HH24:MI:SS') as session_local_time,
-        to_char(b.session_start_local, 'HH24:MI') as session_local_time_of_day,
-        date_part('hour', b.session_start_local)::integer as session_local_hour_of_day,
-        trim(to_char(b.session_start_local, 'd')) as session_local_day_of_week,
-        mod(extract(dow from b.session_start_local)::integer - 1 + 7, 7) as session_local_day_of_week_index,
-
         -- engagement
         b.page_views,
-        b.bounced_page_views,
+
         b.engaged_page_views,
         b.time_engaged_in_s,
 
@@ -232,5 +205,3 @@ sessions as (
 )
 
 select * from sessions
-
-{% endmacro %}

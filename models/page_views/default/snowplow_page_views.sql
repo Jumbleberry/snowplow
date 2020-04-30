@@ -1,19 +1,10 @@
-
-{% macro snowplow_page_views() %}
-
-    {{ adapter_macro('snowplow.snowplow_page_views') }}
-
-{% endmacro %}
-
-
-{% macro default__snowplow_page_views() %}
-
 {{
     config(
         materialized='incremental',
         sort='max_tstamp',
         dist='user_snowplow_domain_id',
-        unique_key='page_view_id'
+        unique_key='page_view_id',
+        enabled=is_adapter('default')
     )
 }}
 
@@ -29,20 +20,26 @@
 with all_events as (
 
     select * from {{ ref('snowplow_web_events') }}
+    
     {% if is_incremental() %}
-    where collector_tstamp > (
-        DATEADD('day', -1 * {{var('snowplow:page_view_lookback_days')}}, (select coalesce(max(max_tstamp), '0001-01-01') from {{ this }}))
-        )
+    
+        where collector_tstamp >
+            {{dbt_utils.dateadd(
+                'day',
+                -1 * var('snowplow:page_view_lookback_days'),
+                get_start_ts(this, 'max_tstamp')
+            )}}
+    
     {% endif %}
+
 ),
 
 filtered_events as (
 
     select * from all_events
+    
     {% if is_incremental() %}
-    where collector_tstamp > (
-        select coalesce(max(max_tstamp), '0001-01-01') from {{ this }}
-    )
+        where collector_tstamp > {{get_start_ts(this, 'max_tstamp')}}
     {% endif %}
 
 ),
@@ -110,27 +107,15 @@ prep as (
         count(*) over (partition by domain_sessionid) as max_session_page_view_index,
 
         -- page view: time
-        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.min_tstamp) as page_view_start,
-        CONVERT_TIMEZONE('UTC', '{{ timezone }}', b.max_tstamp) as page_view_end,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_time,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24:MI') as page_view_minute,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD HH24') as page_view_hour,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM-DD') as page_view_date,
-        to_char(date_trunc('week', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM-DD') as page_view_week,
-        to_char(convert_timezone('UTC', '{{ timezone }}', b.min_tstamp), 'YYYY-MM') as page_view_month,
-        to_char(date_trunc('quarter', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp)), 'YYYY-MM') as page_view_quarter,
-        date_part('y', convert_timezone('UTC', '{{ timezone }}', b.min_tstamp))::INTEGER as page_view_year,
+        {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'b.min_tstamp')}} as page_view_start,
+        {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'b.max_tstamp')}} as page_view_end,
 
         -- page view: time in the user's local timezone
-        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.min_tstamp) as page_view_start_local,
-        convert_timezone('UTC', coalesce(a.os_timezone, '{{ timezone }}'), b.max_tstamp) as page_view_end_local,
-    
-        -- derived dimensions
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'YYYY-MM-DD HH24:MI:SS') as page_view_local_time,
-        to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'HH24:MI') as page_view_local_time_of_day,
-        date_part('hour', convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer as page_view_local_hour_of_day,
-        trim(to_char(convert_timezone('UTC', a.os_timezone, b.min_tstamp), 'd')) as page_view_local_day_of_week,
-        mod(extract(dow from convert_timezone('UTC', a.os_timezone, b.min_tstamp))::integer - 1 + 7, 7) as page_view_local_day_of_week_index,
+        
+        {%- set local_timezone -%} coalesce(a.os_timezone, '{{timezone}}') {%- endset -%}
+        
+        {{convert_timezone("'UTC'", local_timezone, 'b.min_tstamp')}} as page_view_start_local,
+        {{convert_timezone("'UTC'", local_timezone, 'b.max_tstamp')}} as page_view_end_local,
 
         -- engagement
         b.time_engaged_in_s,
@@ -156,7 +141,7 @@ prep as (
             when c.relative_vmax between 75 and 100 then '75% to 100%'
             else null
         end as vertical_percentage_scrolled_tier,
-        case when b.time_engaged_in_s = 0 then true else false end as user_bounced,
+
         case when b.time_engaged_in_s >= 30 and c.relative_vmax >= 25 then true else false end as user_engaged,
 
         -- page
@@ -311,41 +296,13 @@ prep as (
         {% endif %}
 
     where (a.br_family != 'Robot/Spider' or a.br_family is null)
-      and not (
-    (useragent like '%bot%'
-    or useragent like '%crawl%'
-    or useragent like '%slurp%'
-    or useragent like '%spider%'
-    or useragent like '%archiv%'
-    or useragent like '%spinn%'
-    or useragent like '%sniff%'
-    or useragent like '%seo%'
-    or useragent like '%audit%'
-    or useragent like '%survey%'
-    or useragent like '%pingdom%'
-    or useragent like '%worm%'
-    or useragent like '%capture%'
-    or useragent like '%browsershots%'
-    or useragent like '%screenshots%'
-    or useragent like '%analyz%'
-    or useragent like '%index%'
-    or useragent like '%thumb%'
-    or useragent like '%check%'
-    or useragent like '%facebook%'
-    or useragent like '%PingdomBot%'
-    or useragent like '%PhantomJS%'
-    or useragent like '%YorexBot%'
-    or useragent like '%Twitterbot%'
-    or useragent like '%a_archiver%'
-    or useragent like '%facebookexternalhit%'
-    or useragent like '%Bingbot%'
-    or useragent like '%BingPreview%'
-    or useragent like '%Googlebot%'
-    or useragent like '%Baiduspider%'
-    or useragent like '%360Spider%'
-    or useragent like '%360User-agent%'
-    or useragent like '%semalt%')
-        or a.useragent is null)
+      and (
+        not ({% for bad_agent in bot_any() %}
+              lower(useragent) like '%{{bad_agent}}%'
+              {{- 'or' if not loop.last -}}
+            {% endfor %})
+        or a.useragent is null
+      )
       and coalesce(a.br_type, 'unknown') not in ('Bot/Crawler', 'Robot')
       and a.domain_userid is not null
       and a.domain_sessionidx > 0
@@ -366,5 +323,3 @@ final as (
 )
 
 select * from final
-
-{% endmacro %}
