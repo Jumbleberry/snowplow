@@ -1,19 +1,10 @@
-
-{% macro snowplow_web_events_scroll_depth() %}
-
-    {{ adapter_macro('snowplow.snowplow_web_events_scroll_depth') }}
-
-{% endmacro %}
-
-
-{% macro default__snowplow_web_events_scroll_depth() %}
-
 {{
     config(
         materialized='incremental',
         sort='page_view_id',
         dist='page_view_id',
-        unique_key='page_view_id'
+        unique_key='page_view_id',
+        enabled=is_adapter('default')
     )
 }}
 
@@ -26,10 +17,9 @@ with all_events as (
 events as (
 
     select * from all_events
+    
     {% if is_incremental() %}
-    where collector_tstamp > (
-        select coalesce(max(max_tstamp), '0001-01-01') from {{ this }}
-    )
+        where collector_tstamp > {{get_start_ts(this, 'max_tstamp')}}
     {% endif %}
 
 ),
@@ -196,5 +186,3 @@ merged as (
 {% endif %}
 
 select * from merged
-
-{% endmacro %}

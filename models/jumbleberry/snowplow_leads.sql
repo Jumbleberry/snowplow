@@ -6,9 +6,9 @@
     )
 }}
 
-with engagement as (
+with leads as (
 
-    select * from {{ var('snowplow:engagement') }}
+    select * from {{ var('snowplow:lead') }}
 
 ),
 
@@ -18,18 +18,18 @@ event_to_user_map as (
 
 ),
 
-engagement_with_user_id as (
+leads_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(e.*) as engagement_count
-
+        count(l.*) as lead_count
+        
     from event_to_user_map as m
-        inner join engagement as e
-        on m.event_id = e.event_id
+        inner join leads as l 
+        on m.event_id = l.event_id
 
     group by
         m.inferred_user_id
 )
 
-select * from engagement_with_user_id
+select * from leads_with_user_id

@@ -1,4 +1,5 @@
 with source as (
+
     select * from
 
     {% if var('snowplow:use_fivetran_interface') %}

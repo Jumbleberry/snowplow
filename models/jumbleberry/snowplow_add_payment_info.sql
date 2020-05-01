@@ -6,9 +6,9 @@
     )
 }}
 
-with engagement as (
+with add_payment_info as (
 
-    select * from {{ var('snowplow:engagement') }}
+    select * from {{ var('snowplow:add_payment_info') }}
 
 ),
 
@@ -18,18 +18,18 @@ event_to_user_map as (
 
 ),
 
-engagement_with_user_id as (
+add_payment_info_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(e.*) as engagement_count
-
+        count(ap.*) as add_payment_info_count
+        
     from event_to_user_map as m
-        inner join engagement as e
-        on m.event_id = e.event_id
+        inner join add_payment_info as ap
+        on m.event_id = ap.event_id
 
     group by
         m.inferred_user_id
 )
 
-select * from engagement_with_user_id
+select * from add_payment_info_with_user_id

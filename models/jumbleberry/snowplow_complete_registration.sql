@@ -6,9 +6,9 @@
     )
 }}
 
-with engagement as (
+with complete_registration as (
 
-    select * from {{ var('snowplow:engagement') }}
+    select * from {{ var('snowplow:complete_registration') }}
 
 ),
 
@@ -18,18 +18,18 @@ event_to_user_map as (
 
 ),
 
-engagement_with_user_id as (
+complete_registration_with_user_id as (
 
     select 
         m.inferred_user_id,
-        count(e.*) as engagement_count
-
+        count(cr.*) as complete_registration_count
+        
     from event_to_user_map as m
-        inner join engagement as e
-        on m.event_id = e.event_id
+        inner join complete_registration as cr 
+        on m.event_id = cr.event_id
 
     group by
         m.inferred_user_id
 )
 
-select * from engagement_with_user_id
+select * from complete_registration_with_user_id
