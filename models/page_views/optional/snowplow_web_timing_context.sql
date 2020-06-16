@@ -3,7 +3,8 @@
     config(
         materialized='table',
         sort='page_view_id',
-        dist='page_view_id'
+        dist='page_view_id',
+        enabled=(var('snowplow:context:performance_timing') and is_adapter('default'))
     ) 
 }}
 
@@ -49,7 +50,7 @@ prep as (
 
     from performance_timing_context as pt
         inner join web_page_context as wp
-           on pt.event_id = wp.event_id
+           on pt.root_id = wp.root_id
 
     -- all values should be set and some have to be greater than 0 (not the case in about 1% of events)
     where pt.navigation_start is not null and pt.navigation_start > 0
@@ -74,9 +75,13 @@ prep as (
       and pt.load_event_end is not null -- zero is acceptable
 
       -- remove rare outliers (Unix timestamp is more than twice what it should be)
-      and datediff(d, pt.root_tstamp, (timestamp 'epoch' + pt.response_end/1000 * interval '1 second ')) < 365
-      and datediff(d, pt.root_tstamp, (timestamp 'epoch' + pt.unload_event_start/1000 * interval '1 second ')) < 365
-      and datediff(d, pt.root_tstamp, (timestamp 'epoch' + pt.unload_event_end/1000 * interval '1 second ')) < 365
+      
+      {% set ts_columns = ['pt.response_end', 'pt.unload_event_start', 'pt.unload_event_end'] %}
+      {% for ts_column in ts_columns %}
+      
+      and {{ dbt_utils.datediff(dbt_utils.dateadd('millisecond', ts_column, "'1970-01-01'"), 'pt.root_tstamp', 'day') }} < 365
+      
+      {% endfor %}
 
 ),
 

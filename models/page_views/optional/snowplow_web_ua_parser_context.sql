@@ -2,7 +2,8 @@
     config(
         materialized='table',
         sort='page_view_id',
-        dist='page_view_id'
+        dist='page_view_id',
+        enabled=(var('snowplow:context:useragent') and is_adapter('default'))
     )
 }}
 
@@ -39,7 +40,7 @@ prep AS (
       ua.device_family
 
     from ua_parser_context as ua
-        inner join web_page_context as wp on ua.event_id = wp.event_id
+        inner join web_page_context as wp on ua.root_id = wp.root_id
 
     group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 
