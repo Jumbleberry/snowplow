@@ -2,6 +2,7 @@
 #config other dbt settings within ~/.dbt/profiles.yml
 name: 'snowplow'
 version: '0.0.1'
+profile: snowplow
 
 source-paths: ["models"]
 target-path: "target"
