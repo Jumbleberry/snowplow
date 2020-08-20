@@ -19,6 +19,10 @@ with events as (
 
     select * from {{ var('snowplow:events') }}
 
+    {% if target.name == 'dev' %}
+      where collector_tstamp >= dateadd('day', -1, current_date)
+    {% endif %}
+
 ),
 
 fixed as (
