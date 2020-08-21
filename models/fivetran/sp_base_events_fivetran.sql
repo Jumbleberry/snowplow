@@ -85,7 +85,7 @@ fixed as (
         "sequence_number",
         "fixed_event" as "event", -- *
         "fixed_event" as "event_name", -- *
-        "user_ipaddress",
+        SPLIT_PART(user_ipaddress, ',', 1) AS "user_ipaddress",
         "app_id",
         "platform",
         "txn_id",
