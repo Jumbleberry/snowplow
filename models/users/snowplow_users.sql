@@ -46,6 +46,12 @@ upsells as (
 
 ),
 
+web_events_scroll_depth as (
+
+    select * from {{ ref('snowplow_web_events_scroll_depth') }}
+
+),
+
 prep as (
 
     select
@@ -56,7 +62,8 @@ prep as (
         max(session_end) as last_session_end,
         sum(page_views) as page_views,
         count(*) as sessions,
-        sum(time_engaged_in_s) as time_engaged_in_s
+        sum(time_engaged_in_s) as time_engaged_in_s,
+        max(vertical_pixels_scrolled) as vertical_pixels_scrolled
 
     from sessions
 
@@ -103,6 +110,8 @@ users as (
         b.page_views,
         b.sessions,
         b.time_engaged_in_s,
+        b.vertical_pixels_scrolled,
+        -- b.vertical_pixels_scrolled,
 
         -- first page
         a.first_page_url,
@@ -173,6 +182,7 @@ users as (
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
+        -- left join web_events_scroll_depth as w on a.inferred_user_id = w.inferred_user_id
 
     where a.session_index = 1
 )

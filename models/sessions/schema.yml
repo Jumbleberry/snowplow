@@ -51,6 +51,9 @@ models:
              
           - name: time_engaged_in_s_tier
             description: Range of time spent by the user on this visit
+
+          - name: vertical_pixels_scrolled
+            description: Distance the user scrolled vertically in pixels
              
           - name: user_bounced
             description: Did the user bounce on their first page view in this session?
