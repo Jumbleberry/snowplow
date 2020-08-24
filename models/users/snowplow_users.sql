@@ -111,7 +111,6 @@ users as (
         b.sessions,
         b.time_engaged_in_s,
         b.vertical_pixels_scrolled,
-        -- b.vertical_pixels_scrolled,
 
         -- first page
         a.first_page_url,
@@ -182,7 +181,6 @@ users as (
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
-        -- left join web_events_scroll_depth as w on a.inferred_user_id = w.inferred_user_id
 
     where a.session_index = 1
 )
