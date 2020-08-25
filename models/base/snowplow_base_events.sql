@@ -1,6 +1,20 @@
 with source as (
 
-    select * from {{ var('snowplow:events') }}
+    select * from
+
+    {% if var('snowplow:use_fivetran_interface') %}
+
+        {{ref('sp_base_events_fivetran')}}
+
+    {% else %}
+
+        {{ var('snowplow:events') }}
+
+        {% if target.name == 'dev' %}
+          where collector_tstamp >= dateadd('day', -1, current_date)
+        {% endif %}
+
+    {% endif %}
 
 ),
 
