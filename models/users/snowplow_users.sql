@@ -62,9 +62,11 @@ prep as (
         max(session_end) as last_session_end,
         sum(page_views) as page_views,
         count(*) as sessions,
-        sum(time_engaged_in_s) as time_engaged_in_s
-        -- max(vertical_pixels_scrolled) as vertical_pixels_scrolled,
-        -- max(vertical_percentage_scrolled) as vertical_percentage_scrolled
+        sum(time_engaged_in_s) as time_engaged_in_s,
+        max(vertical_pixels_scrolled) as vertical_pixels_scrolled,
+        max(horizontal_pixels_scrolled) as horizontal_pixels_scrolled,
+        max(vertical_percentage_scrolled) as vertical_percentage_scrolled,
+        max(horizontal_percentage_scrolled) as horizontal_percentage_scrolled
 
     from sessions
 
@@ -111,8 +113,10 @@ users as (
         b.page_views,
         b.sessions,
         b.time_engaged_in_s,
-        -- b.vertical_pixels_scrolled,
-        -- b.vertical_percentage_scrolled,
+        b.vertical_pixels_scrolled,
+        b.horizontal_pixels_scrolled,
+        b.vertical_percentage_scrolled,
+        b.horizontal_percentage_scrolled,
 
         -- first page
         a.first_page_url,

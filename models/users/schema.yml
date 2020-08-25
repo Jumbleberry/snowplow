@@ -1,38 +1,149 @@
 version: 2
 
 models:
-    - name: snowplow_users_last_event
-      description: table containing last users event
-      
-      columns:
-        - name: domain_userid
-          tests:
-            - not_null
-            - unique
-                    
-        - name: page_view_id
-          tests:
-            - not_null
-            - unique
-        
-        
-    - name: snowplow_users
-      description: table containing first page view info and purchase values by user 
-      
-      columns:
-        - name: user_snowplow_domain_id
-          tests:
-            - not_null
-          
-        - name: inferred_user_id
-          tests: 
-            - not_null
-            - unique
-            
-        - name: first_session_start
-          tests:
-            - not_null
-        
-        - name: last_session_end
-          tests:
-            - not_null
+  - name: snowplow_users
+    description: table containing first page view info and purchase values by user
+
+    columns:
+      - name: user_snowplow_domain_id
+        tests:
+          - not_null
+
+      - name: inferred_user_id
+        tests:
+          - not_null
+          - unique
+
+      - name: first_session_start
+        tests:
+          - not_null
+
+      - name: last_session_end
+        tests:
+          - not_null
+
+      - name: user_custom_id
+
+      - name: user_snowplow_crossdomain_id
+
+      - name: first_session_time
+
+      - name: first_session_minute
+
+      - name: first_session_hour
+
+      - name: first_session_date
+
+      - name: first_session_week
+
+      - name: first_session_month
+
+      - name: first_session_quarter
+
+      - name: first_session_year
+
+      - name: first_session_start_local
+
+      - name: first_session_local_time
+
+      - name: first_session_local_time_of_day
+
+      - name: first_session_local_hour_of_day
+
+      - name: first_session_local_day_of_week
+
+      - name: first_session_local_day_of_week_index
+
+      - name: page_views
+
+      - name: sessions
+
+      - name: time_engaged_in_s
+
+      - name: vertical_pixels_scrolled
+
+      - name: horizontal_pixels_scrolled
+
+      - name: vertical_percentage_scrolled
+
+      - name: horizontal_percentage_scrolled
+
+      - name: first_page_url
+
+      - name: first_page_url_scheme
+
+      - name: first_page_url_host
+
+      - name: first_page_url_port
+
+      - name: first_page_url_path
+
+      - name: first_page_url_query
+
+      - name: first_page_url_fragment
+
+      - name: first_page_title
+
+      - name: referer_url
+
+      - name: referer_url_scheme
+
+      - name: referer_url_host
+
+      - name: referer_url_port
+
+      - name: referer_url_path
+
+      - name: referer_url_query
+
+      - name: referer_url_fragment
+
+      - name: referer_medium
+
+      - name: referer_source
+
+      - name: referer_term
+
+      - name: marketing_medium
+
+      - name: marketing_source
+
+      - name: marketing_term
+
+      - name: marketing_content
+
+      - name: marketing_campaign
+
+      - name: marketing_click_id
+
+      - name: marketing_network
+
+      - name: app_id
+
+      - name: dedupe
+
+      - name: c_1
+
+      - name: c_2
+
+      - name: c_3
+
+      - name: decline_count
+
+      - name: decline_total_value
+
+      - name: chargeback_count
+
+      - name: chargeback_total_value
+
+      - name: purchase_count
+
+      - name: purchase_max_value
+
+      - name: purchase_total_value
+
+      - name: upsell_count
+
+      - name: upsell_max_value
+
+      - name: upsell_total_value

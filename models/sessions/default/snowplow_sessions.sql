@@ -93,6 +93,10 @@ stitched as (
         session_index as session_cookie_index,
         time_engaged_in_s,
         time_engaged_in_s_tier,
+        vertical_pixels_scrolled,
+        horizontal_pixels_scrolled,
+        vertical_percentage_scrolled,
+        horizontal_percentage_scrolled,
         user_bounced
         
         {%- for column in var('snowplow:pass_through_columns') %}

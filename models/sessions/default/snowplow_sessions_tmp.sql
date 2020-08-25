@@ -52,9 +52,15 @@ prep AS (
         -- engagement
         count(*) as page_views,
 
+        sum(case when user_bounced then 1 else 0 end) as bounced_page_views,
         sum(case when user_engaged then 1 else 0 end) as engaged_page_views,
 
         sum(time_engaged_in_s) as time_engaged_in_s,
+
+        max(vertical_pixels_scrolled) as vertical_pixels_scrolled,
+        max(horizontal_pixels_scrolled) as horizontal_pixels_scrolled,
+        max(vertical_percentage_scrolled) as vertical_percentage_scrolled,
+        max(horizontal_percentage_scrolled) as horizontal_percentage_scrolled,
 
         max(case when last_page_view_in_session = 1 then page_url else null end)
             as exit_page_url
@@ -92,7 +98,12 @@ sessions as (
 
         -- engagement
         b.page_views,
+        b.vertical_pixels_scrolled,
+        b.horizontal_pixels_scrolled,
+        b.vertical_percentage_scrolled,
+        b.horizontal_percentage_scrolled,
 
+        b.bounced_page_views,
         b.engaged_page_views,
         b.time_engaged_in_s,
 
