@@ -61,7 +61,7 @@ relevant_events as (
 
 web_page_context as (
 
-    select root_id as event_id, page_view_id from {{ ref('snowplow_web_page_context') }}
+    select event_id as event_id, page_view_id from {{ ref('snowplow_web_page_context') }}
 
 ),
 
