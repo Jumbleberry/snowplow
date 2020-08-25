@@ -85,6 +85,7 @@ stitched as (
         time_engaged_in_s,
         time_engaged_in_s_tier,
         vertical_pixels_scrolled,
+        vertical_percentage_scrolled,
         user_bounced
 
     from snowplow_sessions as s

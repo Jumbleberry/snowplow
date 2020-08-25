@@ -49,6 +49,7 @@ prep AS (
 
         sum(time_engaged_in_s) as time_engaged_in_s,
         max(vertical_pixels_scrolled) as vertical_pixels_scrolled,
+        max(vertical_percentage_scrolled) as vertical_percentage_scrolled,
 
         max(case when last_page_view_in_session = 1 then page_url else null end)
             as exit_page_url
@@ -103,6 +104,7 @@ sessions as (
         b.engaged_page_views,
         b.time_engaged_in_s,
         b.vertical_pixels_scrolled,
+        b.vertical_percentage_scrolled,
 
         case
             when b.time_engaged_in_s between 0 and 9 then '0s to 9s'

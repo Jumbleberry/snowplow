@@ -54,6 +54,9 @@ models:
 
           - name: vertical_pixels_scrolled
             description: Distance the user scrolled vertically in pixels
+
+          - name: vertical_percentage_scrolled
+            description: Percentage of page scrolled vertically
              
           - name: user_bounced
             description: Did the user bounce on their first page view in this session?
