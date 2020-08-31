@@ -1,7 +1,7 @@
 #settings specifically for this models directory
 #config other dbt settings within ~/.dbt/profiles.yml
-name: 'snowplow'
-version: '0.10.0'
+name: "snowplow"
+version: "0.10.0"
 config-version: 2
 profile: snowplow
 
@@ -16,26 +16,35 @@ macro-paths: ["macros"]
 require-dbt-version: ">=0.17.0"
 
 vars:
-  'snowplow:use_fivetran_interface': true
-  'snowplow:page_ping_frequency': 5
-  'snowplow:events': 'snowplow.event'
-  'snowplow:context:web_page': 'snowplow.web_page'
-  'snowplow:context:performance_timing': false
-  'snowplow:context:useragent': false
-  'snowplow:timezone': 'America/New_York'
-  'snowplow:app_ids': []
-  'snowplow:engagement': 'snowplow.engagement'
-  'snowplow:upsells': 'snowplow.upsell'
-  'snowplow:purchases': 'snowplow.purchase'
-  'snowplow:declines': 'snowplow.decline'
-  'snowplow:chargebacks': 'snowplow.chargeback'
-  'snowplow:add_to_cart': 'snowplow.add_to_cart'
-  'snowplow:remove_from_cart': 'snowplow.remove_from_cart'
-  'snowplow:link_click': 'snowplow.link_click'
-  'snowplow:submit_form': 'snowplow.submit_form'
-  'snowplow:change_form': 'snowplow.change_form'
-  'snowplow:pass_through_columns': []
-  'snowplow:page_view_lookback_days': 1
+  "snowplow:use_fivetran_interface": true
+  "snowplow:page_ping_frequency": 5
+  "snowplow:events": "snowplow.event"
+  "snowplow:context:web_page": "snowplow.web_page"
+  "snowplow:context:performance_timing": false
+  "snowplow:context:useragent": false
+  "snowplow:timezone": "America/New_York"
+  "snowplow:app_ids": []
+  "snowplow:engagement": "snowplow.engagement"
+  "snowplow:upsells": "snowplow.upsell"
+  "snowplow:purchases": "snowplow.purchase"
+  "snowplow:declines": "snowplow.decline"
+  "snowplow:chargebacks": "snowplow.chargeback"
+  "snowplow:add_to_cart": "snowplow.add_to_cart"
+  "snowplow:remove_from_cart": "snowplow.remove_from_cart"
+  "snowplow:link_click": "snowplow.link_click"
+  "snowplow:submit_form": "snowplow.submit_form"
+  "snowplow:change_form": "snowplow.change_form"
+  "snowplow:pass_through_columns": []
+  "snowplow:page_view_lookback_days": 1
+  "jumbleberry:events":
+    [
+      "Lead",
+      "Engagement",
+      "Purchase",
+      "InitiateCheckout",
+      "ViewContent",
+      "AddPaymentInfo",
+    ]
 
 models:
   snowplow:
