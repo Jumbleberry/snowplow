@@ -52,6 +52,48 @@ web_events_scroll_depth as (
 
 ),
 
+pv as (
+
+    select * from {{ ref('snowplow_page_views') }}
+
+),
+
+wesd as (
+
+    select * from {{ ref('snowplow_web_events_scroll_depth') }}
+
+),
+
+wet as (
+  select * from {{ ref('snowplow_web_events_time') }}
+),
+
+scroll_depth as (
+  SELECT
+  pv.user_snowplow_domain_id
+  {%- for column in var('jumbleberry:events') %}
+    , MAX(CASE WHEN pv.page_title = '{{column}}' THEN wesd.vmax ELSE 0 END) AS {{column | lower}}_vertical_pixels_scrolled
+  {% endfor %}
+  FROM pv
+  LEFT JOIN wesd ON wesd.page_view_id = pv.page_view_id
+  GROUP BY pv.user_snowplow_domain_id
+),
+
+time_ellapsed as (
+  SELECT
+  pv.user_snowplow_domain_id
+
+  {%- for column in var('jumbleberry:events') %}
+    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.pv_count ELSE 0 END) AS {{column| lower}}_pv_count
+    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.pp_count ELSE 0 END) AS {{column| lower}}_pp_count
+    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column| lower}}_time_enganged_in_s
+  {% endfor %}
+
+  FROM pv pv
+  LEFT JOIN wet ON wet.page_view_id = pv.page_view_id
+  GROUP BY pv.user_snowplow_domain_id
+),
+
 prep as (
 
     select
@@ -180,6 +222,14 @@ users as (
         u.upsell_max_value,
         u.upsell_total_value
 
+        -- event metrics
+        {%- for column in var('jumbleberry:events') %}
+          , sd.{{column|lower}}_vertical_pixels_scrolled
+          , te.{{column|lower}}_pv_count
+          , te.{{column|lower}}_pp_count
+          , te.{{column|lower}}_time_enganged_in_s
+        {% endfor %}
+
     from sessions as a
         inner join prep as b on a.inferred_user_id = b.inferred_user_id
         left join engagement as e on a.inferred_user_id = e.inferred_user_id
@@ -187,6 +237,8 @@ users as (
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
+        left join scroll_depth as sd on a.inferred_user_id = sd.user_snowplow_domain_id
+        left join time_ellapsed as te on a.inferred_user_id = te.user_snowplow_domain_id
 
     where a.session_index = 1
 )
