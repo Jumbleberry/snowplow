@@ -73,6 +73,7 @@ scroll_depth as (
   pv.user_snowplow_domain_id
   {%- for column in var('jumbleberry:events') %}
     , MAX(CASE WHEN pv.page_title = '{{column}}' THEN wesd.vmax ELSE 0 END) AS {{column | lower}}_vertical_pixels_scrolled
+    , MAX(CASE WHEN pv.page_title = '{{column}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column | lower}}_br_viewheight
   {% endfor %}
   FROM pv
   LEFT JOIN wesd ON wesd.page_view_id = pv.page_view_id
@@ -225,6 +226,7 @@ users as (
         -- event metrics
         {%- for column in var('jumbleberry:events') %}
           , sd.{{column|lower}}_vertical_pixels_scrolled
+          , round(sd.{{column|lower}}_vertical_pixels_scrolled / NULLIF(sd.{{column|lower}}_br_viewheight, 0), 2) AS {{column|lower}}_viewport_consumed
           , te.{{column|lower}}_pv_count
           , te.{{column|lower}}_pp_count
           , te.{{column|lower}}_time_enganged_in_s
