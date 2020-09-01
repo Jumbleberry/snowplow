@@ -37,14 +37,14 @@ vars:
   "snowplow:pass_through_columns": []
   "snowplow:page_view_lookback_days": 1
   "jumbleberry:events":
-    [
-      "Lead",
-      "Engagement",
-      "Purchase",
-      "InitiateCheckout",
-      "ViewContent",
-      "AddPaymentInfo",
-    ]
+    {
+      lead: "Lead",
+      engagement: "Engagement",
+      purchase: "Purchase",
+      initiate_checkout: "InitiateCheckout",
+      view_content: "ViewContent",
+      add_payment_info: "AddPaymentInfo",
+    }
 
 models:
   snowplow:

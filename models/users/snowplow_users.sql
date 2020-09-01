@@ -71,9 +71,9 @@ wet as (
 scroll_depth as (
   SELECT
   pv.user_snowplow_domain_id
-  {%- for column in var('jumbleberry:events') %}
-    , MAX(CASE WHEN pv.page_title = '{{column}}' THEN wesd.vmax ELSE 0 END) AS {{column | lower}}_vertical_pixels_scrolled
-    , MAX(CASE WHEN pv.page_title = '{{column}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column | lower}}_br_viewheight
+  {%- for column, eventName in var('jumbleberry:events').items() %}
+    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.vmax ELSE 0 END) AS {{column}}_vertical_pixels_scrolled
+    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column}}_br_viewheight
   {% endfor %}
   FROM pv
   LEFT JOIN wesd ON wesd.page_view_id = pv.page_view_id
@@ -84,10 +84,10 @@ time_ellapsed as (
   SELECT
   pv.user_snowplow_domain_id
 
-  {%- for column in var('jumbleberry:events') %}
-    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.pv_count ELSE 0 END) AS {{column| lower}}_pv_count
-    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.pp_count ELSE 0 END) AS {{column| lower}}_pp_count
-    , SUM(CASE WHEN pv.page_title = '{{column}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column| lower}}_time_enganged_in_s
+  {%- for column, eventName  in var('jumbleberry:events').items() %}
+    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pv_count ELSE 0 END) AS {{column}}_pv_count
+    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pp_count ELSE 0 END) AS {{column}}_pp_count
+    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column}}_time_enganged_in_s
   {% endfor %}
 
   FROM pv pv
@@ -224,12 +224,12 @@ users as (
         u.upsell_total_value
 
         -- event metrics
-        {%- for column in var('jumbleberry:events') %}
-          , sd.{{column|lower}}_vertical_pixels_scrolled
-          , round(sd.{{column|lower}}_vertical_pixels_scrolled / NULLIF(sd.{{column|lower}}_br_viewheight, 0), 2) AS {{column|lower}}_viewport_consumed
-          , te.{{column|lower}}_pv_count
-          , te.{{column|lower}}_pp_count
-          , te.{{column|lower}}_time_enganged_in_s
+        {%- for column, eventName in var('jumbleberry:events').items() %}
+          , sd.{{column}}_vertical_pixels_scrolled
+          , round(sd.{{column}}_vertical_pixels_scrolled / NULLIF(sd.{{column}}_br_viewheight, 0), 2) AS {{column}}_viewport_consumed
+          , te.{{column}}_pv_count
+          , te.{{column}}_pp_count
+          , te.{{column}}_time_enganged_in_s
         {% endfor %}
 
     from sessions as a
