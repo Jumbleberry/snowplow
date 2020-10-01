@@ -88,6 +88,7 @@ time_ellapsed as (
     , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pv_count ELSE 0 END) AS {{column}}_pv_count
     , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pp_count ELSE 0 END) AS {{column}}_pp_count
     , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column}}_time_enganged_in_s
+    , MIN(CASE WHEN pv.page_title = '{{eventName}}' THEN pv.page_view_start ELSE NULL END) AS {{column}}_page_view_start
   {% endfor %}
 
   FROM pv pv
@@ -99,7 +100,6 @@ prep as (
 
     select
         inferred_user_id,
-
         min(session_start) as first_session_start,
         min(session_start_local) as first_session_start_local,
         max(session_end) as last_session_end,
@@ -122,9 +122,7 @@ users as (
     select
         -- user
         a.inferred_user_id,
-        a.user_custom_id,
         a.user_snowplow_domain_id,
-        a.user_snowplow_crossdomain_id,
 
         -- first sesssion: time
         b.first_session_start,
@@ -230,6 +228,8 @@ users as (
           , te.{{column}}_pv_count
           , te.{{column}}_pp_count
           , te.{{column}}_time_enganged_in_s
+          , te.{{column}}_page_view_start
+          , EXTRACT(EPOCH FROM (te.{{column}}_page_view_start - b.first_session_start)) as {{column}}_time_elapsed_in_s
         {% endfor %}
 
     from sessions as a
