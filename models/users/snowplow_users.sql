@@ -224,7 +224,8 @@ users as (
         -- event metrics
         {%- for column, eventName in var('jumbleberry:events').items() %}
           , sd.{{column}}_vertical_pixels_scrolled
-          , round(sd.{{column}}_vertical_pixels_scrolled / NULLIF(sd.{{column}}_br_viewheight, 0), 2) AS {{column}}_viewport_consumed
+          , sd.{{column}}_br_viewheight AS {{column}}_viewport_length
+          , round(sd.{{column}}_vertical_pixels_scrolled / NULLIF(sd.{{column}}_br_viewheight, 0), 2) + 1 AS {{column}}_viewport_consumed
           , te.{{column}}_pv_count
           , te.{{column}}_pp_count
           , te.{{column}}_time_enganged_in_s
