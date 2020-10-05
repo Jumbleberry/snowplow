@@ -91,6 +91,14 @@ time_ellapsed as (
     , MIN(CASE WHEN pv.page_title = '{{eventName}}' THEN pv.page_view_start ELSE NULL END) AS {{column}}_page_view_start
   {% endfor %}
 
+  , (
+    {%- for column, eventName  in var('jumbleberry:events').items() %}
+      COALESCE({{column}}_pp_count, 0) +
+    {% endfor %}
+    0
+  ) AS page_pings
+  
+
   FROM pv pv
   LEFT JOIN wet ON wet.page_view_id = pv.page_view_id
   GROUP BY pv.user_snowplow_domain_id
@@ -149,9 +157,11 @@ users as (
 
         -- last session: time
         b.last_session_end,
+        to_char(b.last_session_end, 'YYYY-MM-DD') as last_session_date,
 
         -- engagement
         b.page_views,
+        te.page_pings,
         b.sessions,
         b.time_engaged_in_s,
         b.vertical_pixels_scrolled,
