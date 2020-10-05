@@ -171,7 +171,7 @@ users as (
 
         -- last session: time
         b.last_session_end,
-        to_char(b.last_session_end, 'YYYY-MM-DD') as last_session_date,
+        to_char(b.last_session_end, 'YYYY-MM-DD HH24:MI:SS') as last_session_time,
 
         -- engagement
         b.page_views,
