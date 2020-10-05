@@ -70,11 +70,29 @@ wet as (
 
 scroll_depth as (
   SELECT
-  pv.user_snowplow_domain_id
+  pv.user_snowplow_domain_id,
+  MAX(wesd.br_viewheight) AS viewport_length
+
   {%- for column, eventName in var('jumbleberry:events').items() %}
     , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.vmax ELSE 0 END) AS {{column}}_vertical_pixels_scrolled
-    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column}}_br_viewheight
+    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column}}_viewport_length
+    , round({{column}}_vertical_pixels_scrolled / NULLIF({{column}}_viewport_length, 0), 2) + 1 AS {{column}}_viewport_consumed
   {% endfor %}
+
+  , (
+    {%- for column, eventName  in var('jumbleberry:events').items() %}
+      COALESCE({{column}}_vertical_pixels_scrolled, 0) +
+    {% endfor %}
+    0
+  ) AS vertical_pixels_scrolled
+
+  , (
+    {%- for column, eventName  in var('jumbleberry:events').items() %}
+      COALESCE({{column}}_viewport_consumed, 0) +
+    {% endfor %}
+    0
+  ) AS viewports_consumed
+
   FROM pv
   LEFT JOIN wesd ON wesd.page_view_id = pv.page_view_id
   GROUP BY pv.user_snowplow_domain_id
@@ -113,11 +131,7 @@ prep as (
         max(session_end) as last_session_end,
         sum(page_views) as page_views,
         count(*) as sessions,
-        sum(time_engaged_in_s) as time_engaged_in_s,
-        max(vertical_pixels_scrolled) as vertical_pixels_scrolled,
-        max(horizontal_pixels_scrolled) as horizontal_pixels_scrolled,
-        max(vertical_percentage_scrolled) as vertical_percentage_scrolled,
-        max(horizontal_percentage_scrolled) as horizontal_percentage_scrolled
+        sum(time_engaged_in_s) as time_engaged_in_s
 
     from sessions
 
@@ -164,10 +178,9 @@ users as (
         te.page_pings,
         b.sessions,
         b.time_engaged_in_s,
-        b.vertical_pixels_scrolled,
-        b.horizontal_pixels_scrolled,
-        b.vertical_percentage_scrolled,
-        b.horizontal_percentage_scrolled,
+        sd.viewports_consumed,
+        sd.viewport_length,
+        sd.vertical_pixels_scrolled,
 
         -- first page
         a.first_page_url,
@@ -234,12 +247,12 @@ users as (
         -- event metrics
         {%- for column, eventName in var('jumbleberry:events').items() %}
           , sd.{{column}}_vertical_pixels_scrolled
-          , sd.{{column}}_br_viewheight AS {{column}}_viewport_length
-          , round(sd.{{column}}_vertical_pixels_scrolled / NULLIF(sd.{{column}}_br_viewheight, 0), 2) + 1 AS {{column}}_viewport_consumed
+          , sd.{{column}}_viewport_length
+          , sd.{{column}}_viewport_consumed
           , te.{{column}}_pv_count
           , te.{{column}}_pp_count
           , te.{{column}}_time_enganged_in_s
-          , te.{{column}}_page_view_start
+          , to_char(te.{{column}}_page_view_start, 'YYYY-MM-DD HH24:MI:SS') as {{column}}_page_view_start
           , EXTRACT(EPOCH FROM (te.{{column}}_page_view_start - b.first_session_start)) as {{column}}_time_elapsed_in_s
         {% endfor %}
 
