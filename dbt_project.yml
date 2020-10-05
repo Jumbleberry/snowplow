@@ -44,6 +44,7 @@ vars:
       initiate_checkout: "InitiateCheckout",
       view_content: "ViewContent",
       add_payment_info: "AddPaymentInfo",
+      upsell: "Upsell"
     }
 
 models:

@@ -66,6 +66,14 @@ where page_title = 'Purchase'
 group by 1
 ),
 
+upsell as (
+select 
+user_snowplow_domain_id
+from dataform.snowplow_page_views 
+where page_title = 'Upsell'
+group by 1
+),
+
 prep as (
 select
 user_snowplow_domain_id,
@@ -90,7 +98,8 @@ count(vc.user_snowplow_domain_id) as viewcontent,
 count(cr.user_snowplow_domain_id) as completeregistration,
 count(ic.user_snowplow_domain_id) as initiatecheckout,
 count(ap.user_snowplow_domain_id) as addpaymentinfo,
-count(pr.user_snowplow_domain_id) as purchase
+count(pr.user_snowplow_domain_id) as purchase,
+count(up.user_snowplow_domain_id) as upsell
 
 from prep p
 left join engagements eg
@@ -106,6 +115,8 @@ on p.user_snowplow_domain_id = ic.user_snowplow_domain_id
 left join addpaymentinfo ap
 on p.user_snowplow_domain_id = ap.user_snowplow_domain_id
 left join purchase pr
+on p.user_snowplow_domain_id = pr.user_snowplow_domain_id
+left join upsell up
 on p.user_snowplow_domain_id = pr.user_snowplow_domain_id
 
 group by 1,2,3,4,5,6,7,8,9,10
