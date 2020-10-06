@@ -46,7 +46,7 @@ vars:
       add_payment_info: "AddPaymentInfo",
       upsell: "Upsell",
       complete_registration: "CompleteRegistration",
-      add_view: "AddView"
+      ad_view: "AdView"
     }
 
 models:

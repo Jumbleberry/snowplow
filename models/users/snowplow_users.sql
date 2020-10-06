@@ -76,7 +76,7 @@ scroll_depth as (
   {%- for column, eventName in var('jumbleberry:events').items() %}
     , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.vmax ELSE 0 END) AS {{column}}_vertical_pixels_scrolled
     , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column}}_viewport_length
-    , round({{column}}_vertical_pixels_scrolled / NULLIF({{column}}_viewport_length, 0), 2) + 1 AS {{column}}_viewport_consumed
+    , round({{column}}_vertical_pixels_scrolled / NULLIF({{column}}_viewport_length, 0), 2) + 1 AS {{column}}_viewports_consumed
   {% endfor %}
 
   , (
@@ -88,7 +88,7 @@ scroll_depth as (
 
   , (
     {%- for column, eventName  in var('jumbleberry:events').items() %}
-      COALESCE({{column}}_viewport_consumed, 0) +
+      COALESCE({{column}}_viewports_consumed, 0) +
     {% endfor %}
     0
   ) AS viewports_consumed
@@ -105,7 +105,7 @@ time_ellapsed as (
   {%- for column, eventName  in var('jumbleberry:events').items() %}
     , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pv_count ELSE 0 END) AS {{column}}_pv_count
     , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pp_count ELSE 0 END) AS {{column}}_pp_count
-    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column}}_time_enganged_in_s
+    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column}}_time_engaged_in_s
     , MIN(CASE WHEN pv.page_title = '{{eventName}}' THEN pv.page_view_start ELSE NULL END) AS {{column}}_page_view_start
   {% endfor %}
 
@@ -172,6 +172,7 @@ users as (
         -- last session: time
         b.last_session_end,
         to_char(b.last_session_end, 'YYYY-MM-DD HH24:MI:SS') as last_session_time,
+        EXTRACT(EPOCH FROM (b.last_session_end - b.first_session_start)) as time_elapsed_in_s,
 
         -- engagement
         b.page_views,
@@ -248,10 +249,10 @@ users as (
         {%- for column, eventName in var('jumbleberry:events').items() %}
           , sd.{{column}}_vertical_pixels_scrolled
           , sd.{{column}}_viewport_length
-          , sd.{{column}}_viewport_consumed
+          , sd.{{column}}_viewports_consumed
           , te.{{column}}_pv_count
           , te.{{column}}_pp_count
-          , te.{{column}}_time_enganged_in_s
+          , te.{{column}}_time_engaged_in_s
           , to_char(te.{{column}}_page_view_start, 'YYYY-MM-DD HH24:MI:SS') as {{column}}_page_view_start
           , EXTRACT(EPOCH FROM (te.{{column}}_page_view_start - b.first_session_start)) as {{column}}_time_elapsed_in_s
         {% endfor %}
