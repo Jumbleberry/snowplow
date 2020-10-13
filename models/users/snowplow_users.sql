@@ -255,7 +255,9 @@ users as (
           , te.{{column}}_time_engaged_in_s
           , to_char(te.{{column}}_page_view_start, 'YYYY-MM-DD HH24:MI:SS') as {{column}}_page_view_start
           , EXTRACT(EPOCH FROM (te.{{column}}_page_view_start - b.first_session_start)) as {{column}}_time_elapsed_in_s
-        {% endfor %}
+        {% endfor %},
+
+        GETDATE() AS updated
 
     from sessions as a
         inner join prep as b on a.inferred_user_id = b.inferred_user_id
