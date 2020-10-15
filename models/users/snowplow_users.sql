@@ -1,7 +1,7 @@
 
 {{
     config(
-        materialized='table',
+        materialized='incremental',
         sort='first_session_start',
         dist='user_snowplow_domain_id',
         sql_where='first_session_start > (select max(first_session_start) from {{ this }})',
@@ -273,3 +273,9 @@ users as (
 )
 
 select * from users where dedupe = 1
+
+{% if is_incremental() %}
+
+  and last_session_end > (select max(last_session_end) from {{ this }})
+
+{% endif %}
