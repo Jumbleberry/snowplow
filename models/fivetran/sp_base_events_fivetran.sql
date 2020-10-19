@@ -147,7 +147,7 @@ fixed as (
         "useragent",
 
         -- Missing from Fivetran -- injected above
-        "dvce_created_tstamp",
+        COALESCE(dvce_created_tstamp, collector_tstamp) AS "dvce_created_tstamp",
         "etl_tstamp",
         "geo_country",
         "geo_region",
@@ -159,7 +159,7 @@ fixed as (
         "dvce_screenwidth",
         "mkt_clickid",
         "mkt_network",
-        "derived_tstamp",
+        COALESCE(derived_tstamp, collector_tstamp) AS "derived_tstamp",
         "geo_region_name",
 
         null as "ip_isp",
