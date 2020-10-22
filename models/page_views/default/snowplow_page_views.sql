@@ -121,10 +121,11 @@ prep as (
         b.time_engaged_in_s,
 
         case
-            when b.time_engaged_in_s between 0 and 9 then '0s to 9s'
-            when b.time_engaged_in_s between 10 and 29 then '10s to 29s'
-            when b.time_engaged_in_s between 30 and 59 then '30s to 59s'
-            when b.time_engaged_in_s > 59 then '60s or more'
+            when b.time_engaged_in_s >= 180 then '180s_stay'
+            when b.time_engaged_in_s >= 60 then '60s_stay'
+            when b.time_engaged_in_s >= 30 then '30s_stay'
+            when b.time_engaged_in_s >= 10 then '10s_stay'
+            when b.time_engaged_in_s >= 5 then '5s_stay'
             else null
         end as time_engaged_in_s_tier,
 
@@ -135,12 +136,14 @@ prep as (
         c.relative_vmax as vertical_percentage_scrolled,
 
         case
-            when c.relative_vmax between 0 and 24 then '0% to 24%'
-            when c.relative_vmax between 25 and 49 then '25% to 49%'
-            when c.relative_vmax between 50 and 74 then '50% to 74%'
-            when c.relative_vmax between 75 and 100 then '75% to 100%'
+            when c.relative_vmax between 0 and 19 then '0% to 19%'
+            when c.relative_vmax between 20 and 39 then '20% to 39%'
+            when c.relative_vmax between 40 and 59 then '40% to 59%'
+            when c.relative_vmax between 60 and 79 then '60% to 79%'
+            when c.relative_vmax between 80 and 100 then '80% to 100%'
             else null
         end as vertical_percentage_scrolled_tier,
+
         case when b.time_engaged_in_s = 0 then true else false end as user_bounced,
         case when b.time_engaged_in_s >= 30 and c.relative_vmax >= 25 then true else false end as user_engaged,
 
@@ -318,7 +321,8 @@ final as (
             when max_session_page_view_index = page_view_in_session_index
                 then 1
             else 0
-        end as last_page_view_in_session
+        end as last_page_view_in_session,
+    case when lead(page_view_index,1) over (partition by user_snowplow_domain_id order by min_tstamp) - page_view_index = 1 then 1 else 0 end as continued
     from prep
 )
 
