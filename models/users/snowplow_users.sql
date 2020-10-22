@@ -166,6 +166,8 @@ users as (
           COALESCE(upsells_pp_count, 0)
         ) AS page_pings,
 
+        b.viewports_height AS viewport_length,
+
         (
           COALESCE(engagement_vertical_pixels_scrolled, 0) +
           COALESCE(lead_vertical_pixels_scrolled, 0) +
@@ -237,96 +239,118 @@ users as (
         e.c_1,
         e.c_2,
         e.c_3,
+
+        -- ad view (Currently we don't track this event)
+        NULL as ad_view_count,
+        NULL as ad_view_pv_count,
+        NULL as ad_view_pp_count,
+        NULL as ad_view_time_elapsed_in_s,
+        NULL as ad_view_time_engaged_in_s,
+        NULL as ad_view_viewport_length,
+        NULL as ad_view_vertical_pixels_scrolled,
+        NULL as ad_view_viewports_consumed,
+        NULL as ad_view_first_time,
+
+        -- engagement
         e.engagement_count,
         e.engagement_pv_count,
         e.engagement_pp_count,
+        EXTRACT(EPOCH FROM (e.engagement_first_time - b.first_session_start)) as engagement_time_elapsed_in_s,
         e.engagement_time_engaged_in_s,
-        e.engagement_first_time,
-        e.engagement_vertical_pixels_scrolled,
         e.engagement_viewport_length,
+        e.engagement_vertical_pixels_scrolled,
         e.engagement_viewports_consumed,
+        e.engagement_first_time,
 
         -- leads
         l.lead_count,
         l.lead_pv_count,
         l.lead_pp_count,
+        EXTRACT(EPOCH FROM (l.lead_first_time - b.first_session_start)) as lead_time_elapsed_in_s,
         l.lead_time_engaged_in_s,
-        l.lead_first_time,
-        l.lead_vertical_pixels_scrolled,
         l.lead_viewport_length,
+        l.lead_vertical_pixels_scrolled,
         l.lead_viewports_consumed,
+        l.lead_first_time,
 
         -- viewcontent
         v.viewcontent_count,
         v.viewcontent_pv_count,
         v.viewcontent_pp_count,
+        EXTRACT(EPOCH FROM (v.viewcontent_first_time - b.first_session_start)) as viewcontent_time_elapsed_in_s,
         v.viewcontent_time_engaged_in_s,
-        v.viewcontent_first_time,
-        v.viewcontent_vertical_pixels_scrolled,
         v.viewcontent_viewport_length,
+        v.viewcontent_vertical_pixels_scrolled,
         v.viewcontent_viewports_consumed,
+        v.viewcontent_first_time,
 
         -- initiate_checkout
         ic.initiate_checkout_count,
         ic.initiate_checkout_pv_count,
         ic.initiate_checkout_pp_count,
+        EXTRACT(EPOCH FROM (ic.initiate_checkout_first_time - b.first_session_start)) as initiate_checkout_time_elapsed_in_s,
         ic.initiate_checkout_time_engaged_in_s,
-        ic.initiate_checkout_first_time,
-        ic.initiate_checkout_vertical_pixels_scrolled,
         ic.initiate_checkout_viewport_length,
+        ic.initiate_checkout_vertical_pixels_scrolled,
         ic.initiate_checkout_viewports_consumed,
+        ic.initiate_checkout_first_time,
 
         -- add_payment_info
         ap.add_payment_info_count,
         ap.add_payment_info_pv_count,
         ap.add_payment_info_pp_count,
+        EXTRACT(EPOCH FROM (ap.add_payment_info_first_time - b.first_session_start)) as add_payment_info_time_elapsed_in_s,
         ap.add_payment_info_time_engaged_in_s,
-        ap.add_payment_info_first_time,
-        ap.add_payment_info_vertical_pixels_scrolled,
         ap.add_payment_info_viewport_length,
+        ap.add_payment_info_vertical_pixels_scrolled,
         ap.add_payment_info_viewports_consumed,
+        ap.add_payment_info_first_time,
 
         -- add_to_cart
         ac.add_to_cart_count,
         ac.add_to_cart_pv_count,
         ac.add_to_cart_pp_count,
+        EXTRACT(EPOCH FROM (ac.add_to_cart_first_time - b.first_session_start)) as add_to_cart_time_elapsed_in_s,
         ac.add_to_cart_time_engaged_in_s,
-        ac.add_to_cart_first_time,
-        ac.add_to_cart_vertical_pixels_scrolled,
         ac.add_to_cart_viewport_length,
+        ac.add_to_cart_vertical_pixels_scrolled,
         ac.add_to_cart_viewports_consumed,
+        ac.add_to_cart_first_time,
 
         -- complete_registration
         cr.complete_registration_count,
         cr.complete_registration_pv_count,
         cr.complete_registration_pp_count,
+        EXTRACT(EPOCH FROM (cr.complete_registration_first_time - b.first_session_start)) as complete_registration_time_elapsed_in_s,
         cr.complete_registration_time_engaged_in_s,
-        cr.complete_registration_first_time,
-        cr.complete_registration_vertical_pixels_scrolled,
         cr.complete_registration_viewport_length,
+        cr.complete_registration_vertical_pixels_scrolled,
         cr.complete_registration_viewports_consumed,
+        cr.complete_registration_first_time,
 
         -- declines
         d.declines_count,
         d.declines_total_value,
         d.declines_pv_count,
         d.declines_pp_count,
+        EXTRACT(EPOCH FROM (d.declines_first_time - b.first_session_start)) as declines_time_elapsed_in_s,
         d.declines_time_engaged_in_s,
-        d.declines_first_time,
-        d.declines_vertical_pixels_scrolled,
         d.declines_viewport_length,
+        d.declines_vertical_pixels_scrolled,
         d.declines_viewports_consumed,
+        d.declines_first_time,
 
         -- chargebacks
         cb.chargeback_total_value,
         cb.chargebacks_count,
         cb.chargebacks_pv_count,
         cb.chargebacks_pp_count,
+        EXTRACT(EPOCH FROM (cb.chargebacks_first_time - b.first_session_start)) as chargebacks_time_elapsed_in_s,
         cb.chargebacks_time_engaged_in_s,
-        cb.chargebacks_first_time,
-        cb.chargebacks_vertical_pixels_scrolled,
         cb.chargebacks_viewport_length,
+        cb.chargebacks_vertical_pixels_scrolled,
         cb.chargebacks_viewports_consumed,
+        cb.chargebacks_first_time,
 
         -- purchases
         p.purchases_max_value,
@@ -334,11 +358,12 @@ users as (
         p.purchases_count,
         p.purchases_pv_count,
         p.purchases_pp_count,
+        EXTRACT(EPOCH FROM (p.purchases_first_time - b.first_session_start)) as purchases_time_elapsed_in_s,
         p.purchases_time_engaged_in_s,
-        p.purchases_first_time,
-        p.purchases_vertical_pixels_scrolled,
         p.purchases_viewport_length,
+        p.purchases_vertical_pixels_scrolled,
         p.purchases_viewports_consumed,
+        p.purchases_first_time,
 
         -- upsells
         u.upsells_max_value,
@@ -346,11 +371,12 @@ users as (
         u.upsells_count,
         u.upsells_pv_count,
         u.upsells_pp_count,
+        EXTRACT(EPOCH FROM (u.upsells_first_time - b.first_session_start)) as upsells_time_elapsed_in_s,
         u.upsells_time_engaged_in_s,
-        u.upsells_first_time,
-        u.upsells_vertical_pixels_scrolled,
         u.upsells_viewport_length,
+        u.upsells_vertical_pixels_scrolled,
         u.upsells_viewports_consumed,
+        u.upsells_first_time,
 
         GETDATE() AS updated
 
