@@ -22,15 +22,50 @@ engagement as (
 
 ),
 
+lead as (
+
+    select * from {{ ref('snowplow_leads') }}
+
+),
+
+viewcontent as (
+
+    select * from {{ ref('snowplow_viewcontent') }}
+
+),
+
+initiate_checkout as (
+
+    select * from {{ ref('snowplow_initiate_checkout') }}
+
+),
+
+add_payment_info as (
+
+    select * from {{ ref('snowplow_add_payment_info') }}
+
+),
+
+add_to_cart as (
+
+    select * from {{ ref('snowplow_add_to_cart') }}
+
+),
+
 declines as (
 
     select * from {{ ref('snowplow_declines') }}
-
 ),
 
 chargebacks as (
 
     select * from {{ ref('snowplow_chargebacks') }}
+
+),
+
+complete_registration as (
+
+    select * from {{ ref('snowplow_complete_registration') }}
 
 ),
 
@@ -46,82 +81,6 @@ upsells as (
 
 ),
 
-web_events_scroll_depth as (
-
-    select * from {{ ref('snowplow_web_events_scroll_depth') }}
-
-),
-
-pv as (
-
-    select * from {{ ref('snowplow_page_views') }}
-
-),
-
-wesd as (
-
-    select * from {{ ref('snowplow_web_events_scroll_depth') }}
-
-),
-
-wet as (
-  select * from {{ ref('snowplow_web_events_time') }}
-),
-
-scroll_depth as (
-  SELECT
-  pv.user_snowplow_domain_id,
-  MAX(wesd.br_viewheight) AS viewport_length
-
-  {%- for column, eventName in var('jumbleberry:events').items() %}
-    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.vmax ELSE 0 END) AS {{column}}_vertical_pixels_scrolled
-    , MAX(CASE WHEN pv.page_title = '{{eventName}}' THEN wesd.br_viewheight ELSE 0 END) AS {{column}}_viewport_length
-    , round({{column}}_vertical_pixels_scrolled / NULLIF({{column}}_viewport_length, 0), 2) + 1 AS {{column}}_viewports_consumed
-  {% endfor %}
-
-  , (
-    {%- for column, eventName  in var('jumbleberry:events').items() %}
-      COALESCE({{column}}_vertical_pixels_scrolled, 0) +
-    {% endfor %}
-    0
-  ) AS vertical_pixels_scrolled
-
-  , (
-    {%- for column, eventName  in var('jumbleberry:events').items() %}
-      COALESCE({{column}}_viewports_consumed, 0) +
-    {% endfor %}
-    0
-  ) AS viewports_consumed
-
-  FROM pv
-  LEFT JOIN wesd ON wesd.page_view_id = pv.page_view_id
-  GROUP BY pv.user_snowplow_domain_id
-),
-
-time_ellapsed as (
-  SELECT
-  pv.user_snowplow_domain_id
-
-  {%- for column, eventName  in var('jumbleberry:events').items() %}
-    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pv_count ELSE 0 END) AS {{column}}_pv_count
-    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.pp_count ELSE 0 END) AS {{column}}_pp_count
-    , SUM(CASE WHEN pv.page_title = '{{eventName}}' THEN wet.time_engaged_in_s ELSE 0 END) AS {{column}}_time_engaged_in_s
-    , MIN(CASE WHEN pv.page_title = '{{eventName}}' THEN pv.page_view_start ELSE NULL END) AS {{column}}_page_view_start
-  {% endfor %}
-
-  , (
-    {%- for column, eventName  in var('jumbleberry:events').items() %}
-      COALESCE({{column}}_pp_count, 0) +
-    {% endfor %}
-    0
-  ) AS page_pings
-  
-
-  FROM pv pv
-  LEFT JOIN wet ON wet.page_view_id = pv.page_view_id
-  GROUP BY pv.user_snowplow_domain_id
-),
-
 prep as (
 
     select
@@ -131,7 +90,8 @@ prep as (
         max(session_end) as last_session_end,
         sum(page_views) as page_views,
         count(*) as sessions,
-        sum(time_engaged_in_s) as time_engaged_in_s
+        sum(time_engaged_in_s) as time_engaged_in_s,
+        max(viewports_height) as viewports_height
 
     from sessions
 
@@ -162,7 +122,7 @@ users as (
         -- first session: time in the user's local timezone
         b.first_session_start_local,
 
-        -- derived dimensions
+        -- derived local dimensions
         to_char(b.first_session_start_local, 'YYYY-MM-DD HH24:MI:SS') as first_session_local_time,
         to_char(b.first_session_start_local, 'HH24:MI') as first_session_local_time_of_day,
         date_part('hour', b.first_session_start_local)::integer as first_session_local_hour_of_day,
@@ -174,14 +134,65 @@ users as (
         to_char(b.last_session_end, 'YYYY-MM-DD HH24:MI:SS') as last_session_time,
         EXTRACT(EPOCH FROM (b.last_session_end - b.first_session_start)) as time_elapsed_in_s,
 
-        -- engagement
-        b.page_views,
-        te.page_pings,
+        -- session
         b.sessions,
         b.time_engaged_in_s,
-        sd.viewports_consumed,
-        sd.viewport_length,
-        sd.vertical_pixels_scrolled,
+
+        (
+          COALESCE(engagement_pv_count, 0) +
+          COALESCE(lead_pv_count, 0) +
+          COALESCE(viewcontent_pv_count, 0) +
+          COALESCE(initiate_checkout_pv_count, 0) +
+          COALESCE(add_payment_info_pv_count, 0) +
+          COALESCE(add_to_cart_pv_count, 0) +
+          COALESCE(declines_pv_count, 0) +
+          COALESCE(chargebacks_pv_count, 0) +
+          COALESCE(complete_registration_pv_count, 0) +
+          COALESCE(purchases_pv_count, 0) +
+          COALESCE(upsells_pv_count, 0)
+        ) AS page_views,
+
+        (
+          COALESCE(engagement_pp_count, 0) +
+          COALESCE(lead_pp_count, 0) +
+          COALESCE(viewcontent_pp_count, 0) +
+          COALESCE(initiate_checkout_pp_count, 0) +
+          COALESCE(add_payment_info_pp_count, 0) +
+          COALESCE(add_to_cart_pp_count, 0) +
+          COALESCE(declines_pp_count, 0) +
+          COALESCE(chargebacks_pp_count, 0) +
+          COALESCE(complete_registration_pp_count, 0) +
+          COALESCE(purchases_pp_count, 0) +
+          COALESCE(upsells_pp_count, 0)
+        ) AS page_pings,
+
+        (
+          COALESCE(engagement_vertical_pixels_scrolled, 0) +
+          COALESCE(lead_vertical_pixels_scrolled, 0) +
+          COALESCE(viewcontent_vertical_pixels_scrolled, 0) +
+          COALESCE(initiate_checkout_vertical_pixels_scrolled, 0) +
+          COALESCE(add_payment_info_vertical_pixels_scrolled, 0) +
+          COALESCE(add_to_cart_vertical_pixels_scrolled, 0) +
+          COALESCE(declines_vertical_pixels_scrolled, 0) +
+          COALESCE(chargebacks_vertical_pixels_scrolled, 0) +
+          COALESCE(complete_registration_vertical_pixels_scrolled, 0) +
+          COALESCE(purchases_vertical_pixels_scrolled, 0) +
+          COALESCE(upsells_vertical_pixels_scrolled, 0)
+        ) AS vertical_pixels_scrolled,
+
+        (
+          COALESCE(engagement_viewports_consumed, 0) +
+          COALESCE(lead_viewports_consumed, 0) +
+          COALESCE(viewcontent_viewports_consumed, 0) +
+          COALESCE(initiate_checkout_viewports_consumed, 0) +
+          COALESCE(add_payment_info_viewports_consumed, 0) +
+          COALESCE(add_to_cart_viewports_consumed, 0) +
+          COALESCE(declines_viewports_consumed, 0) +
+          COALESCE(chargebacks_viewports_consumed, 0) +
+          COALESCE(complete_registration_viewports_consumed, 0) +
+          COALESCE(purchases_viewports_consumed, 0) +
+          COALESCE(upsells_viewports_consumed, 0)
+        ) AS viewports_consumed,
 
         -- first page
         a.first_page_url,
@@ -226,48 +237,136 @@ users as (
         e.c_1,
         e.c_2,
         e.c_3,
+        e.engagement_count,
+        e.engagement_pv_count,
+        e.engagement_pp_count,
+        e.engagement_time_engaged_in_s,
+        e.engagement_first_time,
+        e.engagement_vertical_pixels_scrolled,
+        e.engagement_viewport_length,
+        e.engagement_viewports_consumed,
+
+        -- leads
+        l.lead_count,
+        l.lead_pv_count,
+        l.lead_pp_count,
+        l.lead_time_engaged_in_s,
+        l.lead_first_time,
+        l.lead_vertical_pixels_scrolled,
+        l.lead_viewport_length,
+        l.lead_viewports_consumed,
+
+        -- viewcontent
+        v.viewcontent_count,
+        v.viewcontent_pv_count,
+        v.viewcontent_pp_count,
+        v.viewcontent_time_engaged_in_s,
+        v.viewcontent_first_time,
+        v.viewcontent_vertical_pixels_scrolled,
+        v.viewcontent_viewport_length,
+        v.viewcontent_viewports_consumed,
+
+        -- initiate_checkout
+        ic.initiate_checkout_count,
+        ic.initiate_checkout_pv_count,
+        ic.initiate_checkout_pp_count,
+        ic.initiate_checkout_time_engaged_in_s,
+        ic.initiate_checkout_first_time,
+        ic.initiate_checkout_vertical_pixels_scrolled,
+        ic.initiate_checkout_viewport_length,
+        ic.initiate_checkout_viewports_consumed,
+
+        -- add_payment_info
+        ap.add_payment_info_count,
+        ap.add_payment_info_pv_count,
+        ap.add_payment_info_pp_count,
+        ap.add_payment_info_time_engaged_in_s,
+        ap.add_payment_info_first_time,
+        ap.add_payment_info_vertical_pixels_scrolled,
+        ap.add_payment_info_viewport_length,
+        ap.add_payment_info_viewports_consumed,
+
+        -- add_to_cart
+        ac.add_to_cart_count,
+        ac.add_to_cart_pv_count,
+        ac.add_to_cart_pp_count,
+        ac.add_to_cart_time_engaged_in_s,
+        ac.add_to_cart_first_time,
+        ac.add_to_cart_vertical_pixels_scrolled,
+        ac.add_to_cart_viewport_length,
+        ac.add_to_cart_viewports_consumed,
+
+        -- complete_registration
+        cr.complete_registration_count,
+        cr.complete_registration_pv_count,
+        cr.complete_registration_pp_count,
+        cr.complete_registration_time_engaged_in_s,
+        cr.complete_registration_first_time,
+        cr.complete_registration_vertical_pixels_scrolled,
+        cr.complete_registration_viewport_length,
+        cr.complete_registration_viewports_consumed,
 
         -- declines
-        d.decline_count,
-        d.decline_total_value,
+        d.declines_count,
+        d.declines_total_value,
+        d.declines_pv_count,
+        d.declines_pp_count,
+        d.declines_time_engaged_in_s,
+        d.declines_first_time,
+        d.declines_vertical_pixels_scrolled,
+        d.declines_viewport_length,
+        d.declines_viewports_consumed,
 
         -- chargebacks
-        cb.chargeback_count,
         cb.chargeback_total_value,
+        cb.chargebacks_count,
+        cb.chargebacks_pv_count,
+        cb.chargebacks_pp_count,
+        cb.chargebacks_time_engaged_in_s,
+        cb.chargebacks_first_time,
+        cb.chargebacks_vertical_pixels_scrolled,
+        cb.chargebacks_viewport_length,
+        cb.chargebacks_viewports_consumed,
 
         -- purchases
-        p.purchase_count,
-        p.purchase_max_value,
-        p.purchase_total_value,
+        p.purchases_max_value,
+        p.purchases_total_value,
+        p.purchases_count,
+        p.purchases_pv_count,
+        p.purchases_pp_count,
+        p.purchases_time_engaged_in_s,
+        p.purchases_first_time,
+        p.purchases_vertical_pixels_scrolled,
+        p.purchases_viewport_length,
+        p.purchases_viewports_consumed,
 
         -- upsells
-        u.upsell_count,
-        u.upsell_max_value,
-        u.upsell_total_value
-
-        -- event metrics
-        {%- for column, eventName in var('jumbleberry:events').items() %}
-          , sd.{{column}}_vertical_pixels_scrolled
-          , sd.{{column}}_viewport_length
-          , sd.{{column}}_viewports_consumed
-          , te.{{column}}_pv_count
-          , te.{{column}}_pp_count
-          , te.{{column}}_time_engaged_in_s
-          , to_char(te.{{column}}_page_view_start, 'YYYY-MM-DD HH24:MI:SS') as {{column}}_page_view_start
-          , EXTRACT(EPOCH FROM (te.{{column}}_page_view_start - b.first_session_start)) as {{column}}_time_elapsed_in_s
-        {% endfor %},
+        u.upsells_max_value,
+        u.upsells_total_value,
+        u.upsells_count,
+        u.upsells_pv_count,
+        u.upsells_pp_count,
+        u.upsells_time_engaged_in_s,
+        u.upsells_first_time,
+        u.upsells_vertical_pixels_scrolled,
+        u.upsells_viewport_length,
+        u.upsells_viewports_consumed,
 
         GETDATE() AS updated
 
     from sessions as a
         inner join prep as b on a.inferred_user_id = b.inferred_user_id
         left join engagement as e on a.inferred_user_id = e.inferred_user_id
+        left join lead as l on a.inferred_user_id = l.inferred_user_id
+        left join viewcontent as v on a.inferred_user_id = v.inferred_user_id
+        left join initiate_checkout as ic on a.inferred_user_id = ic.inferred_user_id
+        left join add_payment_info as ap on a.inferred_user_id = ap.inferred_user_id
+        left join add_to_cart as ac on a.inferred_user_id = ac.inferred_user_id
+        left join complete_registration as cr on a.inferred_user_id = cr.inferred_user_id
         left join declines as d on a.inferred_user_id = d.inferred_user_id
         left join chargebacks as cb on a.inferred_user_id = cb.inferred_user_id
         left join purchases as p on a.inferred_user_id = p.inferred_user_id
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
-        left join scroll_depth as sd on a.inferred_user_id = sd.user_snowplow_domain_id
-        left join time_ellapsed as te on a.inferred_user_id = te.user_snowplow_domain_id
 
     where a.session_index = 1
 )

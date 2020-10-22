@@ -25,6 +25,11 @@ vars:
   "snowplow:timezone": "America/New_York"
   "snowplow:app_ids": []
   "snowplow:engagement": "snowplow.engagement"
+  "snowplow:lead": "snowplow.lead"
+  "snowplow:viewcontent": "snowplow.view_content"
+  "snowplow:complete_registration": "snowplow.complete_registration"
+  "snowplow:initiate_checkout": "snowplow.initiate_checkout"
+  "snowplow:add_payment_info": "snowplow.add_payment_info"
   "snowplow:upsells": "snowplow.upsell"
   "snowplow:purchases": "snowplow.purchase"
   "snowplow:declines": "snowplow.decline"
@@ -36,18 +41,6 @@ vars:
   "snowplow:change_form": "snowplow.change_form"
   "snowplow:pass_through_columns": []
   "snowplow:page_view_lookback_days": 1
-  "jumbleberry:events":
-    {
-      lead: "Lead",
-      engagement: "Engagement",
-      purchase: "Purchase",
-      initiate_checkout: "InitiateCheckout",
-      view_content: "ViewContent",
-      add_payment_info: "AddPaymentInfo",
-      upsell: "Upsell",
-      complete_registration: "CompleteRegistration",
-      ad_view: "AdView"
-    }
 
 models:
   snowplow:
