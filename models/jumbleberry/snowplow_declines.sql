@@ -52,9 +52,9 @@ declines_with_user_id as (
 
     from event_to_user_map as m 
         inner join declines as e on m.event_id = e.event_id
-        inner join web_page_context as c on e.event_id = c.event_id
-        inner join web_events_time as t on c.page_view_id = t.page_view_id
-        inner join web_events_scroll_depth as d on c.page_view_id = d.page_view_id
+        left join web_page_context as c on e.event_id = c.event_id
+        left join web_events_time as t on c.page_view_id = t.page_view_id
+        left join web_events_scroll_depth as d on c.page_view_id = d.page_view_id
 
     group by
         m.inferred_user_id
