@@ -43,7 +43,8 @@ prep as (
 
         sum(case when ev.event_name = 'page_view' then 1 else 0 end) as pv_count,
         sum(case when ev.event_name = 'page_ping' then 1 else 0 end) as pp_count,
-        (sum(case when ev.event_name = 'page_ping' then 1 else 0 end) * {{ var('snowplow:page_ping_frequency', 30) }}) as time_engaged_in_s
+        (sum(case when ev.event_name = 'page_ping' then 1 else 0 end) * {{ var('snowplow:page_ping_frequency', 30) }}) as summed_time_engaged_in_s,
+        CASE WHEN summed_time_engaged_in_s = 0 THEN 0 ELSE summed_time_engaged_in_s + 3 END AS time_engaged_in_s -- First page ping fires 3 seconds after the page is loaded
 
     from events as ev
         inner join web_page_context as wp on ev.event_id = wp.event_id
