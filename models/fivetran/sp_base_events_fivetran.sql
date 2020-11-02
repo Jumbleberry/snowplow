@@ -30,9 +30,7 @@ fixed as (
              when event = 'pp' then 'page_ping'
         else event end as fixed_event,
         null::timestamp as etl_tstamp,
-        null as dvce_screenwidth,
-        null as mkt_clickid,
-        null as mkt_network
+        null as dvce_screenwidth
 
     from events
 
