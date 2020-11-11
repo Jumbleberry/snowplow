@@ -65,7 +65,8 @@ relevant_existing as (
         max_tstamp,
         pv_count,
         pp_count,
-        time_engaged_in_s
+        time_engaged_in_s,
+        summed_time_engaged_in_s
 
     from {{ this }}
     where page_view_id in (select page_view_id from prep)
@@ -80,7 +81,8 @@ unioned_cte as (
         max_tstamp,
         pv_count,
         pp_count,
-        time_engaged_in_s
+        time_engaged_in_s,
+        summed_time_engaged_in_s
     from prep
 
     union all
@@ -91,7 +93,8 @@ unioned_cte as (
         max_tstamp,
         pv_count,
         pp_count,
-        time_engaged_in_s
+        time_engaged_in_s,
+        summed_time_engaged_in_s
     from relevant_existing
 
 ),
@@ -104,7 +107,8 @@ merged as (
         max(max_tstamp) as max_tstamp,
         sum(pv_count) as pv_count,
         sum(pp_count) as pp_count,
-        sum(time_engaged_in_s) as time_engaged_in_s
+        sum(time_engaged_in_s) as time_engaged_in_s,
+        sum(summed_time_engaged_in_s) as summed_time_engaged_in_s
 
     from unioned_cte
     group by 1
