@@ -398,6 +398,7 @@ users as (
 
     {% if is_incremental() %}
 
+      {{ log("This is an incremental run", info=True) }}
       and last_session_end > (select max(last_session_end) from {{ this }})
 
     {% endif %}
