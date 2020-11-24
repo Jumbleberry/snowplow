@@ -2,10 +2,9 @@
 {{
     config(
         materialized='incremental',
-        sort='first_session_start',
-        dist='user_snowplow_domain_id',
-        sql_where='first_session_start > (select max(first_session_start) from {{ this }})',
-        unique_key='user_snowplow_domain_id'
+        sort='last_session_end',
+        dist='inferred_user_id',
+        unique_key='inferred_user_id'
     )
 }}
 
