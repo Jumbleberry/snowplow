@@ -395,12 +395,12 @@ users as (
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
 
     where a.session_index = 1
+
+    {% if is_incremental() %}
+
+      and last_session_end > (select max(last_session_end) from {{ this }})
+
+    {% endif %}
 )
 
 select * from users where dedupe = 1
-
-{% if is_incremental() %}
-
-  and last_session_end > (select max(last_session_end) from {{ this }})
-
-{% endif %}
