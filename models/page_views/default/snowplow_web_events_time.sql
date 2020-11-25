@@ -38,8 +38,8 @@ prep as (
 
         wp.page_view_id,
 
-        min({{snowplow.timestamp_ntz('ev.derived_tstamp')}}) as min_tstamp,
-        max({{snowplow.timestamp_ntz('ev.derived_tstamp')}}) as max_tstamp,
+        least(min({{snowplow.timestamp_ntz('ev.collector_tstamp')}}), min({{snowplow.timestamp_ntz('ev.derived_tstamp')}})) as min_tstamp,
+        least(max({{snowplow.timestamp_ntz('ev.collector_tstamp')}}), max({{snowplow.timestamp_ntz('ev.derived_tstamp')}})) as max_tstamp,
 
         sum(case when ev.event_name = 'page_view' then 1 else 0 end) as pv_count,
         sum(case when ev.event_name = 'page_ping' then 1 else 0 end) as pp_count,
