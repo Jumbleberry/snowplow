@@ -62,6 +62,7 @@ prep AS (
         max(vertical_percentage_scrolled) as vertical_percentage_scrolled,
         max(horizontal_percentage_scrolled) as horizontal_percentage_scrolled,
         max(browser_window_height) as viewports_height,
+        max(page_height) as page_height,
 
         max(case when last_page_view_in_session = 1 then page_url else null end)
             as exit_page_url
@@ -104,6 +105,7 @@ sessions as (
         b.vertical_percentage_scrolled,
         b.horizontal_percentage_scrolled,
         b.viewports_height,
+        b.page_height,
 
         b.bounced_page_views,
         b.engaged_page_views,

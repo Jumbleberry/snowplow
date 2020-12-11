@@ -47,7 +47,8 @@ initiate_checkout_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as initiate_checkout_first_time,
         MAX(d.vmax) AS initiate_checkout_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS initiate_checkout_viewport_length,
-        round(initiate_checkout_vertical_pixels_scrolled / NULLIF(initiate_checkout_viewport_length, 0), 2) + 1 AS initiate_checkout_viewports_consumed
+        round(initiate_checkout_vertical_pixels_scrolled / NULLIF(initiate_checkout_viewport_length, 0), 2) + 1 AS initiate_checkout_viewports_consumed,
+        MAX(d.doc_height) AS initiate_checkout_page_length
 
     from event_to_user_map as m
         inner join initiate_checkout as e on m.event_id = e.event_id

@@ -98,6 +98,7 @@ stitched as (
         vertical_percentage_scrolled,
         horizontal_percentage_scrolled,
         viewports_height,
+        page_height,
         user_bounced
         
         {%- for column in var('snowplow:pass_through_columns') %}

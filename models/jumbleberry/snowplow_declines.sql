@@ -48,7 +48,8 @@ declines_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as declines_first_time,
         MAX(d.vmax) AS declines_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS declines_viewport_length,
-        round(declines_vertical_pixels_scrolled / NULLIF(declines_viewport_length, 0), 2) + 1 AS declines_viewports_consumed
+        round(declines_vertical_pixels_scrolled / NULLIF(declines_viewport_length, 0), 2) + 1 AS declines_viewports_consumed,
+        MAX(d.doc_height) AS declines_page_length
 
     from event_to_user_map as m 
         inner join declines as e on m.event_id = e.event_id

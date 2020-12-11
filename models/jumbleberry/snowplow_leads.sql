@@ -47,7 +47,8 @@ lead_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as lead_first_time,
         MAX(d.vmax) AS lead_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS lead_viewport_length,
-        round(lead_vertical_pixels_scrolled / NULLIF(lead_viewport_length, 0), 2) + 1 AS lead_viewports_consumed
+        round(lead_vertical_pixels_scrolled / NULLIF(lead_viewport_length, 0), 2) + 1 AS lead_viewports_consumed,
+        MAX(d.doc_height) AS lead_page_length
         
     from event_to_user_map as m
         inner join lead as e on m.event_id = e.event_id

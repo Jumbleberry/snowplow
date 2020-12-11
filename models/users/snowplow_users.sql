@@ -90,7 +90,8 @@ prep as (
         sum(page_views) as page_views,
         count(*) as sessions,
         sum(time_engaged_in_s) as time_engaged_in_s,
-        max(viewports_height) as viewports_height
+        max(viewports_height) as viewports_height,
+        max(page_height) as page_height
 
     from sessions
 
@@ -166,6 +167,7 @@ users as (
         ) AS page_pings,
 
         b.viewports_height AS viewport_length,
+        b.page_height AS page_height,
 
         (
           COALESCE(engagement_vertical_pixels_scrolled, 0) +
@@ -248,6 +250,7 @@ users as (
         NULL as ad_view_viewport_length,
         NULL as ad_view_vertical_pixels_scrolled,
         NULL as ad_view_viewports_consumed,
+        NULL as ad_view_page_length,
         NULL as ad_view_first_time,
 
         -- engagement
@@ -259,6 +262,7 @@ users as (
         e.engagement_viewport_length,
         e.engagement_vertical_pixels_scrolled,
         e.engagement_viewports_consumed,
+        e.engagement_page_length,
         e.engagement_first_time,
 
         -- leads
@@ -270,6 +274,7 @@ users as (
         l.lead_viewport_length,
         l.lead_vertical_pixels_scrolled,
         l.lead_viewports_consumed,
+        l.lead_page_length,
         l.lead_first_time,
 
         -- viewcontent
@@ -281,6 +286,7 @@ users as (
         v.viewcontent_viewport_length,
         v.viewcontent_vertical_pixels_scrolled,
         v.viewcontent_viewports_consumed,
+        v.viewcontent_page_length,
         v.viewcontent_first_time,
 
         -- initiate_checkout
@@ -292,6 +298,7 @@ users as (
         ic.initiate_checkout_viewport_length,
         ic.initiate_checkout_vertical_pixels_scrolled,
         ic.initiate_checkout_viewports_consumed,
+        ic.initiate_checkout_page_length,
         ic.initiate_checkout_first_time,
 
         -- add_payment_info
@@ -303,6 +310,7 @@ users as (
         ap.add_payment_info_viewport_length,
         ap.add_payment_info_vertical_pixels_scrolled,
         ap.add_payment_info_viewports_consumed,
+        ap.add_payment_info_page_length,
         ap.add_payment_info_first_time,
 
         -- add_to_cart
@@ -314,6 +322,7 @@ users as (
         ac.add_to_cart_viewport_length,
         ac.add_to_cart_vertical_pixels_scrolled,
         ac.add_to_cart_viewports_consumed,
+        ac.add_to_cart_page_length,
         ac.add_to_cart_first_time,
 
         -- complete_registration
@@ -325,6 +334,7 @@ users as (
         cr.complete_registration_viewport_length,
         cr.complete_registration_vertical_pixels_scrolled,
         cr.complete_registration_viewports_consumed,
+        cr.complete_registration_page_length,
         cr.complete_registration_first_time,
 
         -- declines
@@ -337,6 +347,7 @@ users as (
         d.declines_viewport_length,
         d.declines_vertical_pixels_scrolled,
         d.declines_viewports_consumed,
+        d.declines_page_length,
         d.declines_first_time,
 
         -- chargebacks
@@ -349,6 +360,7 @@ users as (
         cb.chargebacks_viewport_length,
         cb.chargebacks_vertical_pixels_scrolled,
         cb.chargebacks_viewports_consumed,
+        cb.chargebacks_page_length,
         cb.chargebacks_first_time,
 
         -- purchases
@@ -362,6 +374,7 @@ users as (
         p.purchases_viewport_length,
         p.purchases_vertical_pixels_scrolled,
         p.purchases_viewports_consumed,
+        p.purchases_page_length,
         p.purchases_first_time,
 
         -- upsells
@@ -375,6 +388,7 @@ users as (
         u.upsells_viewport_length,
         u.upsells_vertical_pixels_scrolled,
         u.upsells_viewports_consumed,
+        u.upsells_page_length,
         u.upsells_first_time,
 
         GETDATE() AS updated

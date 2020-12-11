@@ -47,7 +47,8 @@ viewcontent_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as viewcontent_first_time,
         MAX(d.vmax) AS viewcontent_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS viewcontent_viewport_length,
-        round(viewcontent_vertical_pixels_scrolled / NULLIF(viewcontent_viewport_length, 0), 2) + 1 AS viewcontent_viewports_consumed
+        round(viewcontent_vertical_pixels_scrolled / NULLIF(viewcontent_viewport_length, 0), 2) + 1 AS viewcontent_viewports_consumed,
+        MAX(d.doc_height) AS viewcontent_page_length
         
     from event_to_user_map as m
         inner join viewcontent as e on m.event_id = e.event_id

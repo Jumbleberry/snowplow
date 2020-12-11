@@ -49,7 +49,8 @@ upsells_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as upsells_first_time,
         MAX(d.vmax) AS upsells_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS upsells_viewport_length,
-        round(upsells_vertical_pixels_scrolled / NULLIF(upsells_viewport_length, 0), 2) + 1 AS upsells_viewports_consumed
+        round(upsells_vertical_pixels_scrolled / NULLIF(upsells_viewport_length, 0), 2) + 1 AS upsells_viewports_consumed,
+        MAX(d.doc_height) AS upsells_page_length
 
     from event_to_user_map as m
         inner join upsells as e on m.event_id = e.event_id

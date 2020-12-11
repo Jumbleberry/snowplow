@@ -48,7 +48,8 @@ chargebacks_with_user_id as (
         {{convert_timezone("'UTC'", "'" ~ timezone ~ "'", 'MIN(t.min_tstamp)')}} as chargebacks_first_time,
         MAX(d.vmax) AS chargebacks_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS chargebacks_viewport_length,
-        round(chargebacks_vertical_pixels_scrolled / NULLIF(chargebacks_viewport_length, 0), 2) + 1 AS chargebacks_viewports_consumed
+        round(chargebacks_vertical_pixels_scrolled / NULLIF(chargebacks_viewport_length, 0), 2) + 1 AS chargebacks_viewports_consumed,
+        MAX(d.doc_height) AS chargebacks_page_length
 
     from event_to_user_map as m
         inner join chargebacks as e on m.event_id = e.event_id
