@@ -90,8 +90,8 @@ prep as (
         sum(page_views) as page_views,
         count(*) as sessions,
         sum(time_engaged_in_s) as time_engaged_in_s,
-        max(viewports_height) as viewports_height,
-        max(page_height) as page_height
+        max(viewport_height) as viewport_height,
+        max(viewport_width) as viewport_width
 
     from sessions
 
@@ -166,8 +166,8 @@ users as (
           COALESCE(upsells_pp_count, 0)
         ) AS page_pings,
 
-        b.viewports_height AS viewport_length,
-        b.page_height AS page_height,
+        b.viewport_height AS viewport_height,
+        b.viewport_width AS viewport_width,
 
         (
           COALESCE(engagement_vertical_pixels_scrolled, 0) +
