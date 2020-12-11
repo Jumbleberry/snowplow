@@ -50,7 +50,7 @@ purchases_with_user_id as (
         MAX(d.vmax) AS purchases_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS purchases_viewport_length,
         round(purchases_vertical_pixels_scrolled / NULLIF(purchases_viewport_length, 0), 2) + 1 AS purchases_viewports_consumed,
-        MAX(d.doc_height) AS purchases_page_length
+        MAX(d.doc_height) AS purchases_page_height
 
     from event_to_user_map as m
         inner join purchases as e on m.event_id = e.event_id

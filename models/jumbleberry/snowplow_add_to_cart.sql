@@ -48,7 +48,7 @@ add_to_cart_with_user_id as (
         MAX(d.vmax) AS add_to_cart_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS add_to_cart_viewport_length,
         round(add_to_cart_vertical_pixels_scrolled / NULLIF(add_to_cart_viewport_length, 0), 2) + 1 AS add_to_cart_viewports_consumed,
-        MAX(d.doc_height) AS add_to_cart_page_length
+        MAX(d.doc_height) AS add_to_cart_page_height
 
     from event_to_user_map as m
         inner join add_to_cart as e on m.event_id = e.event_id

@@ -48,7 +48,7 @@ initiate_checkout_with_user_id as (
         MAX(d.vmax) AS initiate_checkout_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS initiate_checkout_viewport_length,
         round(initiate_checkout_vertical_pixels_scrolled / NULLIF(initiate_checkout_viewport_length, 0), 2) + 1 AS initiate_checkout_viewports_consumed,
-        MAX(d.doc_height) AS initiate_checkout_page_length
+        MAX(d.doc_height) AS initiate_checkout_page_height
 
     from event_to_user_map as m
         inner join initiate_checkout as e on m.event_id = e.event_id

@@ -48,7 +48,7 @@ lead_with_user_id as (
         MAX(d.vmax) AS lead_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS lead_viewport_length,
         round(lead_vertical_pixels_scrolled / NULLIF(lead_viewport_length, 0), 2) + 1 AS lead_viewports_consumed,
-        MAX(d.doc_height) AS lead_page_length
+        MAX(d.doc_height) AS lead_page_height
         
     from event_to_user_map as m
         inner join lead as e on m.event_id = e.event_id

@@ -48,7 +48,7 @@ add_payment_info_with_user_id as (
         MAX(d.vmax) AS add_payment_info_vertical_pixels_scrolled,
         MAX(d.br_viewheight) AS add_payment_info_viewport_length,
         round(add_payment_info_vertical_pixels_scrolled / NULLIF(add_payment_info_viewport_length, 0), 2) + 1 AS add_payment_info_viewports_consumed,
-        MAX(d.doc_height) AS add_payment_info_page_length
+        MAX(d.doc_height) AS add_payment_info_page_height
         
     from event_to_user_map as m
         inner join add_payment_info as e on m.event_id = e.event_id
