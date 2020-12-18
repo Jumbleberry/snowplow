@@ -411,7 +411,7 @@ users as (
 
     {% if is_incremental() %}
 
-      and last_session_end > (select max(last_session_end) from {{ this }})
+      and last_session_end > {{get_start_ts(this, 'last_session_end')}}
 
     {% endif %}
 )
