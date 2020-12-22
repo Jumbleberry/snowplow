@@ -4,7 +4,9 @@
         materialized='incremental',
         sort='last_session_end',
         dist='inferred_user_id',
-        unique_key='inferred_user_id'
+        unique_key='inferred_user_id',
+        pre_hook=before_begin("CREATE TABLE IF NOT EXISTS {{ target.schema }}.user_model_query_lock(start_time TIMESTAMP NOT NULL DEFAULT NOW())"),
+        post_hook=after_commit("DROP TABLE {{ target.schema }}.user_model_query_lock")
     )
 }}
 
@@ -97,6 +99,17 @@ prep as (
 
     group by 1
 
+),
+
+incrementl_prep as (
+
+    select * from prep
+
+    {% if is_incremental() %}
+
+      where last_session_end > {{get_start_ts(this, 'last_session_end')}}
+
+    {% endif %}
 ),
 
 users as (
@@ -394,7 +407,7 @@ users as (
         GETDATE() AS updated
 
     from sessions as a
-        inner join prep as b on a.inferred_user_id = b.inferred_user_id
+        inner join incrementl_prep as b on a.inferred_user_id = b.inferred_user_id
         left join engagement as e on a.inferred_user_id = e.inferred_user_id
         left join lead as l on a.inferred_user_id = l.inferred_user_id
         left join viewcontent as v on a.inferred_user_id = v.inferred_user_id
@@ -408,12 +421,6 @@ users as (
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
 
     where a.session_index = 1
-
-    {% if is_incremental() %}
-
-      and last_session_end > {{get_start_ts(this, 'last_session_end')}}
-
-    {% endif %}
 )
 
 select * from users where dedupe = 1
