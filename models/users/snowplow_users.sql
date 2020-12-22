@@ -4,7 +4,9 @@
         materialized='incremental',
         sort='last_session_end',
         dist='inferred_user_id',
-        unique_key='inferred_user_id'
+        unique_key='inferred_user_id',
+        pre_hook=before_begin("CREATE TABLE IF NOT EXISTS {{ target.schema }}.user_model_query_lock(start_time TIMESTAMP NOT NULL DEFAULT NOW())"),
+        post_hook=after_commit("DROP TABLE {{ target.schema }}.user_model_query_lock")
     )
 }}
 
@@ -94,6 +96,10 @@ prep as (
         max(viewport_width) as viewport_width
 
     from sessions
+    
+    {% if is_incremental() %}
+      where last_session_end > {{get_start_ts(this, 'last_session_end')}}
+    {% endif %}
 
     group by 1
 
@@ -408,12 +414,6 @@ users as (
         left join upsells as u on a.inferred_user_id = u.inferred_user_id
 
     where a.session_index = 1
-
-    {% if is_incremental() %}
-
-      and last_session_end > {{get_start_ts(this, 'last_session_end')}}
-
-    {% endif %}
 )
 
 select * from users where dedupe = 1
