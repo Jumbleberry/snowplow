@@ -96,13 +96,14 @@ prep as (
         max(viewport_width) as viewport_width
 
     from sessions
-    
-    {% if is_incremental() %}
-      where last_session_end > {{get_start_ts(this, 'last_session_end')}}
-    {% endif %}
 
     group by 1
-
+    
+    {% if is_incremental() %}
+    
+      having 4 > {{get_start_ts(this, 'last_session_end')}}
+                               
+    {% endif %}
 ),
 
 users as (
