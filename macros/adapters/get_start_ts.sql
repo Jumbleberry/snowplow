@@ -29,7 +29,7 @@
 
 
 {%- macro get_start_ts(relation, field = 'collector_tstamp') -%}
-    {{ adapter_macro('get_start_ts', relation, field) }}
+    {{ return(adapter.dispatch('get_start_ts')(relation, field)) }}
 {%- endmacro -%}
 
 
