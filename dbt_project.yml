@@ -13,7 +13,7 @@ analysis-paths: ["analysis"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
 
-require-dbt-version: ">=0.17.0"
+require-dbt-version: ">=1.4.0"
 
 vars:
   "snowplow:use_fivetran_interface": true
