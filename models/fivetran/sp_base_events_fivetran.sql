@@ -20,7 +20,7 @@ with events as (
     select * from {{ var('snowplow:events') }}
 
     {% if target.name == 'dev' %}
-      where collector_tstamp >= dateadd('day', -3, current_date)
+      where collector_tstamp between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
     {% endif %}
 
 ),
