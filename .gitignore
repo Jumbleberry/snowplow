@@ -5,3 +5,5 @@
 /logs
 .DS_Store
 .vscode
+profiles.yml
+.user.yml

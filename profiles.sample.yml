@@ -1,0 +1,14 @@
+snowplow:
+  outputs:
+
+    dev:
+      type: postgres
+      threads: 1
+      host: sample.host
+      port: 5439
+      user: user
+      pass: pass
+      dbname: dbname
+      schema: schema
+
+  target: dev
