@@ -14,6 +14,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'Engagement'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -22,6 +25,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'Lead'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -30,6 +36,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'ViewContent'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -38,6 +47,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'CompleteRegistration'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -46,6 +58,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'InitiateCheckout'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -54,6 +69,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'AddPaymentInfo'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -62,6 +80,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'Purchase'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -70,6 +91,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'Upsell'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 
@@ -78,6 +102,9 @@ select
 user_snowplow_domain_id
 from dataform.snowplow_page_views 
 where page_title = 'AddView'
+{% if target.name == 'dev' %}
+    and page_view_start between dateadd('month', -2, current_date) and dateadd('month', -1, current_date)
+{% endif %}
 group by 1
 ),
 

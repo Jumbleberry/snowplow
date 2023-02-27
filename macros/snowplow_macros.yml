@@ -92,7 +92,7 @@ macros:
         type: string
         description: "*default* or *bigquery*"
       
-  - name: timestamp_ntz
+  - name: snowplow_timestamp_ntz
     description: >
       Adapter macro that supports Snowflake's good-yet-eccentric behavior
       around timestamps and timezones. The default implementation returns the

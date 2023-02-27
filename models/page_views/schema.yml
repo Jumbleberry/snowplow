@@ -17,7 +17,7 @@ models:
             tests:
                 - not_null
                         
-          - name: domain_sessionid
+          - name: domain_sessionidx
             tests:
                 - not_null
                 

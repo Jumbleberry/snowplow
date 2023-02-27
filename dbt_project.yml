@@ -5,15 +5,15 @@ version: "0.10.0"
 config-version: 2
 profile: snowplow
 
-source-paths: ["models"]
+model-paths: ["models"]
 target-path: "target"
 clean-targets: ["target"]
 test-paths: ["test"]
 analysis-paths: ["analysis"]
-data-paths: ["data"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 
-require-dbt-version: ">=0.17.0"
+require-dbt-version: ">=1.4.0"
 
 vars:
   "snowplow:use_fivetran_interface": true
